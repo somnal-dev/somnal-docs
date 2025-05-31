@@ -5,34 +5,34 @@ sidebar_position: 2
 2017년에 Facebook 에서 만든 npm 대체 패키지 매니저.<br/>
 npm 의 보안문제를 해결하여 더 안정성을 갖고 있음.
 
-### 장점
+## 장점
 
 npm 대비 빠른 속도 (여러개의 패키지를 병렬로 설치하므로 빠름)
 
 <br/>
 <br/>
 
-### 동작 순서
+## 동작 순서
 
 - 1. Resolution
 - 2. Fetch
 - 3. Link
 
-#### Resolution
+### Resolution
 - 라이브러리 버전 고정
 - 라이브러리의 다른 의존성 확인
 - 라이브러리의 다른 의존성 버전 고정
 
-#### Fetch
+### Fetch
 - 결정된 버전으로 패키지를 실제 다운로드
 
-#### Link
+### Link
 - 프로젝트에서 사용할 수 있도록 패키지와 연결 (import, require 문과 연결)
 
 <br/>
 <br/>
 
-### 설치 방법
+## 설치 방법
 ```bash
 npm install -g yarn
 ```

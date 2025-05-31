@@ -96,7 +96,7 @@ const config = {
             ],
           },
         ],
-        copyright: `Copyright © ${new Date().getFullYear()} Somnal. Built with Docusaurus.`,
+        copyright: `Copyright ${new Date().getFullYear()}. Somnal All rights reserved.`,
       },
       prism: {
         theme: lightCodeTheme,

@@ -1,35 +1,44 @@
 import React from 'react';
-import clsx from 'clsx';
-import Link from '@docusaurus/Link';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Layout from '@theme/Layout';
-import HomepageFeatures from '@site/src/components/HomepageFeatures';
 
 import styles from './index.module.css';
 
-function HomepageHeader() {
-  const {siteConfig} = useDocusaurusContext();
+function Section({
+    text,
+    desc,
+    to
+}) {
   return (
-    <header className={clsx('hero hero--primary', styles.heroBanner)}>
-      <div className="container">
-        {/*<h1 className="hero__title">{siteConfig.title}</h1>*/}
-        {/*<p className="hero__subtitle">{siteConfig.tagline}</p>*/}
-        <div className={styles.buttons}>
-        </div>
-      </div>
-    </header>
-  );
+      <a
+          className="pagination-nav__link text--center"
+          href={to}>
+        <h1 style={{color: "white"}}>{text}</h1>
+        <div className="pagination-nav__label">{desc}</div>
+      </a>
+  )
 }
 
 export default function Home() {
   const {siteConfig} = useDocusaurusContext();
   return (
-    <Layout
-      description="Description will go into a meta tag in <head />">
-      {/*<HomepageHeader />*/}
-      {/*<main>*/}
-      {/*  <HomepageFeatures />*/}
-      {/*</main>*/}
+    <Layout>
+      <div
+          className="container"
+          style={{paddingTop:'30px', paddingLeft:'10vh', paddingRight:'10vh'}}
+      >
+        <Section
+          text={"🤖 안드로이드"}
+          desc={"문서보기"}
+          to={"docs/category/-안드로이드"}
+        />
+        <br/>
+        <Section
+            text={"💻 프론트엔드"}
+            desc={"문서보기"}
+            to={"docs/category/-프론트엔드"}
+        />
+      </div>
     </Layout>
   );
 }

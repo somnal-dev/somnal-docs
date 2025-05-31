@@ -33,6 +33,8 @@ const config = {
       /** @type {import('@docusaurus/preset-classic').Options} */
       ({
         docs: {
+          sidebarCollapsed: false,
+          sidebarCollapsible: false,
           sidebarPath: require.resolve('./sidebars.js'),
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
@@ -64,18 +66,10 @@ const config = {
         items: [
           {
             type: 'doc',
-            routeBasePath: '/',
-            to: '/docs/android',
-            docId: 'android/index',
-            label: '안드로이드',
+            to: '/docs',
+            docId: 'index',
+            label: '문서',
             position: 'left',
-          },
-          {
-            type: 'doc',
-            to: '/docs/frontend',
-            docId: 'frontend/index',
-            label: '프론트엔드',
-            position: 'left'
           },
           {
             href: 'https://github.com/somnal-dev',

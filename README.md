@@ -1,5 +1,5 @@
-# Somnal Frontend Docs
+# Somnal Docs
 
 프론트엔드에 대해 공부한 내용들을 정리하는 Repository 입니다.
 
-https://somnal-frontend-docs.vercel.app
+https://somnal-docs.vercel.app

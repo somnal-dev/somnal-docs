@@ -84,13 +84,13 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   outline: none;
   transition: all 0.3s ease;
+}
 
-  /* 포커스 시 변화 */
-  &:focus !important; {
-    border-color: #007bff;
-    background-color: #ffffff;
-    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
-  }
+/* 포커스 시 변화 */
+.exampleInput:focus {
+  border-color: #007bff;
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
 }
 
 .exampleInput::placeholder {

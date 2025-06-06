@@ -13,7 +13,7 @@ function Section({
       <a
           className="pagination-nav__link text--center"
           href={to}>
-        <h1 style={{color: "white"}}>{text}</h1>
+        <h1 style={{ color: 'var(--ifm-color-emphasis-800)'}}>{text}</h1>
         <div className="pagination-nav__label">{desc}</div>
       </a>
   )

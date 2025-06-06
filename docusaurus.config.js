@@ -103,7 +103,7 @@ const config = {
       algolia: {
         appId: 'T3QWX7B39S',
         apiKey: 'eb81e1902a31acff96b58c57a5886da3',
-        indexName: 'somnal-docs'
+        indexName: 'somnal_docs_vercel_app_t3qwx7b39s_pages'
       }
     }),
 };

@@ -28,15 +28,15 @@ export default function Home() {
           style={{paddingTop:'30px', paddingLeft:'10vh', paddingRight:'10vh'}}
       >
         <Section
-          text={"🤖 안드로이드"}
+          text={"안드로이드"}
           desc={"문서보기"}
-          to={"docs/category/-안드로이드"}
+          to={"docs/category/안드로이드"}
         />
         <br/>
         <Section
-            text={"💻 프론트엔드"}
+            text={"프론트엔드"}
             desc={"문서보기"}
-            to={"docs/category/-프론트엔드"}
+            to={"docs/category/프론트엔드"}
         />
       </div>
     </Layout>

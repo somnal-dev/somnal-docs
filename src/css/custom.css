@@ -32,3 +32,96 @@
 
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 }
+
+.menu__list .menu__list-item {
+  font-weight: 800;
+  /*font-size: 1.1rem;*/
+}
+.menu__list .menu__list .menu__list-item {
+  padding-left: 1rem;
+  font-weight: 500;
+  /*font-size: 0.8rem;*/
+}
+
+.menu__list .menu__list .menu__list .menu__list-item {
+  font-weight: 400;
+  /*font-size: 0.8rem;*/
+}
+
+/*.menu__list .menu__list-item .menu__link::before {*/
+/*  content: "- ";*/
+/*  margin-right: 0.5rem;*/
+/*}*/
+
+.menu__list .menu__list .menu__list-item .menu__link::before {
+  content: "🌟";
+  margin-right: 0.5rem;
+}
+
+/* 3단계 깊이 - 점 스타일 */
+.menu__list .menu__list .menu__list .menu__list-item .menu__link::before {
+  content: "•";
+}
+
+.menu__list .menu__list .menu__list .menu__list .menu__list-item .menu__link::before {
+  content: "-";
+}
+
+.exampleContainer {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.exampleInput {
+  width: 100%;
+  max-width: 300px;
+  padding: 12px 16px;
+  font-size: 16px;
+  color: black;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  outline: none;
+  transition: all 0.3s ease;
+
+  /* 포커스 시 변화 */
+  &:focus {
+    border-color: #007bff;
+    background-color: #ffffff;
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+  }
+}
+
+.exampleInput::placeholder {
+  color: #999;
+  font-style: italic;
+}
+
+.exampleButton {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+.exampleButton:hover {
+  background-color: #0056b3;
+}
+
+.exampleButton:active {
+  background-color: #004085;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.exampleButton:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.5);
+}
+

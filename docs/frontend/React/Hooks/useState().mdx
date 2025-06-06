@@ -1,0 +1,42 @@
+import {UseStateTest} from "../../../../src/components/UseStateTest";
+
+useState는 React에서 상태(state)를 관리할 때 사용하는 기본적인 훅.
+컴포넌트 내에서 동적인 데이터를 다룰 수 있게 만들어 줌.
+
+## 기본 개념
+
+- 컴포넌트 내부에 상태 변수를 선언하면 해당 값을 변경(set) 할 수 있도록 함수 제공
+- 값이 변경되면 해당 컴포넌트는 자동으로 리렌더링 됨.
+
+## 문법
+```typescript
+import {useState} from "react";
+
+const [state, setState] = useState(initialValue);
+```
+- state: 현재 상태 값
+- setState: 상태를 변경하는 함수
+- initialValue: 상태의 초기값
+
+## 활용
+
+<UseStateTest />
+
+```typescript jsx
+import { useState } from 'react';
+
+function Counter() {
+    const [count, setCount] = useState(0); // 상태 선언
+
+    const handleClick = () => {
+        setCount(count + 1); // 상태 변경 -> 리렌더링 발생
+    };
+
+    return (
+        <>
+            <p>현재 카운트: {count}</p>
+            <button onClick={handleClick}>+1</button>
+        </>
+    );
+}
+```

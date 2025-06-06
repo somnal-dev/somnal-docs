@@ -70,7 +70,7 @@ const config = {
           {
             type: 'doc',
             to: '/docs',
-            docId: 'index',
+            docId: 'android/index',
             label: '문서',
             position: 'left',
           },

@@ -55,7 +55,7 @@
 /*}*/
 
 .menu__list .menu__list .menu__list-item .menu__link::before {
-  content: "🌟";
+  content: "-";
   margin-right: 0.5rem;
 }
 

@@ -1,0 +1,49 @@
+---
+title: Nx
+sidebar_position: 1
+---
+
+## Nx란 무엇인가 ?
+
+모노레포(Monorepo) 툴<br/>
+여러 개의 프로젝트(앱, 라이브러리)를 하나의 저장소에서 관리할 수 있도록 도와주는 도구<br/>
+npm, yarn, pnpm 기반 패키지 관리 구조와 호환 가능
+
+## 명령어
+
+### 모노레포 (워크스페이스) 초기화
+Nx 워크스페이스(모노레포) 초기화<br/>
+프로젝트 생성 마법사 실행 → 템플릿 선택 가능
+```bash
+npx create-nx-workspace@latest
+```
+
+### 라이브러리, 컴포넌트, 모듈 등 코드 생성
+
+```bash
+# 앱 생성
+nx generate @nrwl/react:app my-app
+
+# 라이브러리 생성
+nx generate @nrwl/react:lib ui-components
+```
+
+혹은 축약 명령어 사용가능
+
+```bash
+# 앱 생성
+nx g @nrwl/react:app my-app
+
+# 라이브러리 생성
+nx g @nrwl/react:lib ui-components
+```
+
+### 프로젝트 구조 확인
+```bash
+nx graph
+```
+
+### 의존성 그래프 확인
+```bash
+nx dep-graph
+```

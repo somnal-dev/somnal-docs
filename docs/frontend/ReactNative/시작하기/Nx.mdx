@@ -1,0 +1,37 @@
+---
+title: Nx
+sidebar_position: 1
+---
+
+## Nx로 시작하기
+
+```bash
+npx create-nx-workspace@latest <프로젝트 이름> --preset=react-native --packageManager=yarn --appName=mobile
+```
+
+```bash
+cd <프로젝트 이름>
+```
+
+## 앱 생성
+```bash
+nx generate @nrwl/react-native:app <앱 이름>
+```
+
+## 라이브러리 생성
+```bash
+nx generate @nrwl/react-native:lib components
+nx generate @nrwl/react-native:lib core
+```
+
+## 실행
+```bash
+# iOS 실행
+nx run mobile:run-ios
+
+# Android 실행
+nx run mobile:run-android
+
+# Metro 서버만 시작
+nx run mobile:start
+```

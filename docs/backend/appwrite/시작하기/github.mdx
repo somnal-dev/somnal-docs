@@ -1,0 +1,24 @@
+---
+sidebar_position: 1
+---
+# GitHub 연동
+
+[시작하기](/docs/backend/appwrite/시작하기/docker) 에서 생성한 appwrite폴더 밑에 <br/>
+.env 파일을 통해서 설정이 가능하다.
+
+```dotenv
+_APP_DOMAIN=appwrite.example.com
+_APP_DOMAIN_TARGET=appwrite.example.com
+_APP_DOMAIN_FUNCTIONS=functions.example.com
+_APP_VCS_GITHUB_APP_NAME=<깃허브 어플리케이션 이름 (깃허브에서 직접 생성해야함)>
+_APP_VCS_GITHUB_PRIVATE_KEY="\n로 구분된 PRIVATE_KEY"
+_APP_VCS_GITHUB_APP_ID=<깃허브 어플리케이션의 APP ID>
+_APP_VCS_GITHUB_CLIENT_ID=<깃허브 어플리케이션의 CLIENT ID>
+_APP_VCS_GITHUB_CLIENT_SECRET=<깃허브 어플리케이션의 CLIENT SECRET>
+_APP_VCS_GITHUB_WEBHOOK_SECRET=<깃허브 어플리케이션의 웹훅 SECRET>
+```
+
+설정 후 appwrite를 재생성 및 재시작 한다.
+```bash
+docker-compmose up -d --force-recreate
+```

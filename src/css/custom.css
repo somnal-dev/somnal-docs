@@ -34,18 +34,30 @@
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 }
 
-.menu__list .menu__list-item {
-  font-weight: 800;
-  /*font-size: 1.1rem;*/
+.menu__caret:before {
+  height: 0.5rem;
+  width: 0.5rem;
 }
+
+.menu__link--sublist-caret:after {
+  min-width: 0;
+  height: 0.5rem;
+  width: 0.5rem;
+}
+
+.menu__list .menu__list-item {
+  /*font-weight: 500;*/
+  font-size: 1.25rem;
+}
+
 .menu__list .menu__list .menu__list-item {
   padding-left: 1rem;
-  font-weight: 500;
-  /*font-size: 0.8rem;*/
+  /*font-weight: 500;*/
+  font-size: 0.9rem;
 }
 
 .menu__list .menu__list .menu__list .menu__list-item {
-  font-weight: 400;
+  /*font-weight: 400;*/
   /*font-size: 0.8rem;*/
 }
 

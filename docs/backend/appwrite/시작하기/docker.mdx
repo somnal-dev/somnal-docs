@@ -1,0 +1,21 @@
+
+# docker 로 시작하기
+
+```bash
+docker run -it --rm \
+    -p <포트번호>:80 \
+    --volume /var/run/docker.sock:/var/run/docker.sock \
+    --volume "$(pwd)"/appwrite:/usr/src/code/appwrite:rw \
+    --entrypoint="install" \
+    appwrite/appwrite:1.7.4
+```
+AppWrite 내부 포트를 30001로 바꾸고,
+외부 포트번호를 30001 으로 하고싶다면
+```bash
+docker run -it --rm \
+    -p 30001:30001 \
+    --volume /var/run/docker.sock:/var/run/docker.sock \
+    --volume "$(pwd)"/appwrite:/usr/src/code/appwrite:rw \
+    --entrypoint="install" \
+    appwrite/appwrite:1.7.4
+```

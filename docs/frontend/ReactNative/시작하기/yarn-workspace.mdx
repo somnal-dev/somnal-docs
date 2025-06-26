@@ -1,0 +1,168 @@
+---
+title: Yarn Workspace로 시작하기
+sidebar_position: 1
+---
+
+### 1. workspace 생성
+
+yarn init 의 -w 옵션은 package.json 에 workspace 옵션을 추가해준다.
+
+```bash
+mkdir <프로젝트명>
+cd <프로젝트명>
+
+# Yarn Berry 설정
+yarn set version berry
+yarn init -w
+```
+
+### 2. 루트 package.json 수정
+
+```json
+{
+  "name": "<프로젝트명>",
+  "packageManager": "yarn@4.9.2",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ]
+}
+```
+
+### 3. 타입스크립트 설정
+
+```bash
+yarn add -D typescript @types/node
+```
+또한, yarn add 시 자동으로 @types/* 패키지를 설치해주는 플러그인 설치
+```bash
+yarn plugin import typescript
+```
+
+### 4. 루트 프로젝트 tsconfig 설정
+`tsconfig.base.json`
+```json
+{
+  "compilerOptions": {
+    "target": "es2017",
+    "module": "commonjs",
+    "lib": ["es2017", "dom"],
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "rootDir": ".",
+    "outDir": "./dist",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "incremental": true
+  }
+}
+```
+
+### 5. ESLint / Prettier 설정
+
+```bash
+yarn add -D @types/eslint
+yarn add -D @typescript-eslint/eslint-plugin
+yarn add -D @typescript-eslint/parser
+yarn add -D eslint eslint-config-prettier
+yarn add -D eslint-config-standard-with-typescript
+yarn add -D eslint-plugin-import
+yarn add -D eslint-plugin-n
+yarn add -D eslint-plugin-prettier
+yarn add -D eslint-plugin-promise
+yarn add -D eslint-plugin-react
+yarn add -D prettier
+yarn add -D prettier-plugin-tailwindcss
+```
+
+### 6. .eslintrc.js 작성
+```js
+module.exports = {
+    parser: '@typescript-eslint/parser',
+    env: {
+      browser: true,
+      es2021: true,
+      node: true,
+    },
+    extends: ["standard-with-typescript", "plugin:react/recommended", "plugin:prettier/recommended"],
+    overrides: [
+      {
+        env: {
+          node: true,
+        },
+        files: [".eslintrc.{js,cjs}"],
+        parserOptions: {
+          sourceType: "script",
+        },
+      },
+    ],
+    parserOptions: {
+      ecmaVersion: "latest",
+      sourceType: "module",
+      tsconfigRootDir: __dirname,
+      project: "./tsconfig.base.json",
+    },
+    plugins: ['react', '@typescript-eslint/eslint-plugin', "prettier"],
+    rules: {
+
+    },
+    ignorePatterns: ['.eslintrc.js', 'dist'],
+    settings: {
+      react: {
+       version: "detect",
+      },
+    },
+};
+```
+
+### 7. apps 폴더 생성 및 React Native App 생성
+```bash
+mkdir apps
+cd apps
+```
+```bash
+yarn dlx @react-native-community/cli@latest init mobile \
+--skip-install --pm yarn
+```
+
+### 8. mobile 폴더 내 nodeLinker 정의
+/apps/mobile/.yarnrc.yml 파일 생성
+```yaml
+nodeLinker: node-modules
+```
+
+apps 폴더 이외에는 모두 pnp 모드 사용
+/.yarnrc.yml
+```yaml
+plugins:
+  - path: .yarn/plugins/@yarnpkg/plugin-typescript.cjs
+    spec: "@yarnpkg/plugin-typescript"
+
+yarnPath: .yarn/releases/yarn-4.9.2.cjs
+nodeLinker: pnp
+```
+<br/>
+.yarnignore 파일 생성
+
+```ignorelang
+apps/mobile/**
+```
+
+### 9. 패키지 종속성 설치
+```bash
+cd apps/mobile
+yarn install
+
+cd ios
+pod install
+```
+
+### 10. 실행
+```bash
+yarn start
+yarn ios
+yarn android
+```

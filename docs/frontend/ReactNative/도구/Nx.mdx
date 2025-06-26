@@ -15,27 +15,27 @@ npm, yarn, pnpm 기반 패키지 관리 구조와 호환 가능
 Nx 워크스페이스(모노레포) 초기화<br/>
 프로젝트 생성 마법사 실행 → 템플릿 선택 가능
 ```bash
-npx create-nx-workspace@latest
+npx create-nx-workspace@latest <프로젝트명> --preset=react-native --packageManager=yarn --appName=mobile
 ```
 
 ### 라이브러리, 컴포넌트, 모듈 등 코드 생성
 
 ```bash
 # 앱 생성
-nx generate @nrwl/react:app my-app
+nx generate @nx/react:app my-app
 
 # 라이브러리 생성
-nx generate @nrwl/react:lib ui-components
+nx generate @nx/react:lib ui-components
 ```
 
 혹은 축약 명령어 사용가능
 
 ```bash
 # 앱 생성
-nx g @nrwl/react:app my-app
+nx g @nx/react:app my-app
 
 # 라이브러리 생성
-nx g @nrwl/react:lib ui-components
+nx g @nx/react:lib ui-components
 ```
 
 ### 프로젝트 구조 확인

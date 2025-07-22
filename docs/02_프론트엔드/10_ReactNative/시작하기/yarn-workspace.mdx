@@ -144,11 +144,15 @@ plugins:
 yarnPath: .yarn/releases/yarn-4.9.2.cjs
 nodeLinker: pnp
 ```
-<br/>
 .yarnignore 파일 생성
 
 ```ignorelang
 apps/mobile/**
+```
+
+/apps/mobile 폴더 내 yarn.lock 파일 생성 (빈 파일)
+```bash
+touch yarn.lock
 ```
 
 ### 9. 패키지 종속성 설치

@@ -1,6 +1,8 @@
-// tsconfig.json
 {
+  // This file is not used in compilation. It is here just for a nice editor experience.
+  "extends": "@docusaurus/tsconfig",
   "compilerOptions": {
-    "jsx": "react-jsx" // React 17+ 자동 JSX 변환
-  }
+    "baseUrl": "."
+  },
+  "exclude": [".docusaurus", "build"]
 }

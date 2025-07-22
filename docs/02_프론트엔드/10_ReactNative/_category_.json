@@ -1,6 +1,6 @@
 {
-  "label": "Android",
-  "position": 1,
+  "collapsed": true,
+  "collapsible": true,
   "link": {
     "type": "generated-index"
   }

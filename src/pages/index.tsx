@@ -1,6 +1,7 @@
 import type {ReactNode} from 'react';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Layout from '@theme/Layout';
+import { useEffect } from 'react';
 
 function Section({
     text,
@@ -17,8 +18,9 @@ function Section({
     )
 }
 
-export default function Home(): ReactNode {
-    location.href = "/docs";
-
-    return <></>
+export default function Home() {
+  useEffect(() => {
+    window.location.href = "/docs";
+  }, []);
+  return null;
 }

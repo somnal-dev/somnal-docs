@@ -33,6 +33,10 @@ const config: Config = {
           '@component': path.resolve(__dirname, 'src/component'),
         }
       }
+    ],
+    [
+      'docusaurus-lunr-search',
+      {},
     ]
   ],
   // Even if you don't use internationalization, you can use this field to set

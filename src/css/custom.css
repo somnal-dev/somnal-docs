@@ -98,31 +98,3 @@ code {
   color: #999;
   font-style: italic;
 }
-
-.exampleButton {
-  padding: 10px 20px;
-  font-size: 16px;
-  background-color: #007bff;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-transform: uppercase;
-  font-weight: bold;
-}
-
-.exampleButton:hover {
-  background-color: #0056b3;
-}
-
-.exampleButton:active {
-  background-color: #004085;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.exampleButton:focus {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.5);
-}
-

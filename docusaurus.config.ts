@@ -36,7 +36,12 @@ const config: Config = {
     ],
     [
       'docusaurus-lunr-search',
-      {},
+      {
+        indexBaseUrl: true,
+        fields: {
+          content: { boost: 5 },
+        }
+      },
     ]
   ],
   // Even if you don't use internationalization, you can use this field to set

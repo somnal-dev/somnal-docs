@@ -38,8 +38,11 @@ const config: Config = {
       'docusaurus-lunr-search',
       {
         indexBaseUrl: true,
+        languages: ['ko'],
         fields: {
-          content: { boost: 5 },
+          title: { boost: 200 },
+          content: { boost: 50 },
+          keywords: { boost: 100 },
         }
       },
     ]

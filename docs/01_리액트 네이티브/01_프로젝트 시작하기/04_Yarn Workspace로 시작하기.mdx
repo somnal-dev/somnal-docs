@@ -1,0 +1,58 @@
+import { Button, Picture } from '@component';
+
+## 1. pakcages 폴더 생성
+```bash
+mkdir packages
+```
+
+## 2. Yarn 프로젝트 생성
+
+```bash
+yarn init -y
+```
+
+## 3. package.json 수정
+```json
+{
+  "private": "true",
+  "name": "프로젝트 이름",
+  "version": "1.0.0",
+  "workspaces": [
+    "packages/*"
+  ]
+}
+```
+
+## 4. React Native 프로젝트 생성 (packages 폴더에서 실행)
+
+```sh
+npx @react-native-community/cli init synapse --directory mobile --template react-native-template-typescript@latest
+```
+
+## 5. iOS 셋팅
+
+##### 1. Podfile 수정
+```js
+require_relative '../node_modules/react-native/scripts/react_native_pods'
+require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
+```
+위의 내용을 아래와 같이 수정
+```js
+require_relative '../../../node_modules/react-native/scripts/react_native_pods'
+require_relative '../../../node_modules/@react-native-community/cli-platform-ios/native_modules'
+```
+
+##### 2. pod install 수행
+```bash
+pod install
+```
+
+##### 3. Xcode를 열고 경로 변경
+```bash
+cd packages/mobile/ios
+open xxx.xcworkspace
+```
+
+`Project settings > Build Phases open “Bundle React Native code and images”` 펼치기
+
+<Picture src={'/img/Xcode세팅.png'} width={'700px'}/>

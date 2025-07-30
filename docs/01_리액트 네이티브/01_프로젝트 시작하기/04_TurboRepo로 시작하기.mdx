@@ -1,2 +1,20 @@
 import { Button } from '@component';
 
+## 1. TurboRepo 프로젝트 시작
+
+```sh
+npx create-turbo@latest -e with-vite
+```
+
+## 2. React Native 프로젝트 시작
+
+```sh
+cd apps
+npx @react-native-community/cli@latest init mobile --template react-native-template-typescript@latest
+```
+
+## 3. iOS 프로젝트 빌드
+```sh
+cd apps/mobile/ios
+pod install
+```

@@ -55,4 +55,18 @@ open xxx.xcworkspace
 
 `Project settings > Build Phases open “Bundle React Native code and images”` 펼치기
 
+아래와 같이 내용 수정
+
 <Picture src={'/img/Xcode세팅.png'} width={'700px'}/>
+
+## 6. 안드로이드 셋팅
+
+### 1. build.gradle 수정
+
+```kotlin
+// packages/mobile/android/app/build.gradle
+
+react { 
+  hermesCommand = "../../node_modules/react-native/sdks/hermesc/%OS-BIN%/hermesc"
+}
+```

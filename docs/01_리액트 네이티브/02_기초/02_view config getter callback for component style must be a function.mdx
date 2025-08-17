@@ -1,0 +1,35 @@
+---
+title: view config getter callback for component 'style' must be a function
+---
+
+```bash
+view config getter callback for component style must be a function (received undefined )
+```
+
+## 원인
+
+리액트 네이티브에서는 "@emotion/styled" 사용 시 오류 발생
+
+```tsx
+import styled from '@emotion/styled';
+
+const StyledComponent = styled.View`
+  background-color: red;
+`;
+
+export default StyledComponent;
+```
+
+## 해결방법
+
+"@emotion/styled" 대신 "@emotion/native" 사용
+
+```tsx
+import styled from '@emotion/native';
+
+const StyledComponent = styled.View`
+  background-color: red;
+`;
+
+export default StyledComponent;
+```

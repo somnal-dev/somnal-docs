@@ -1,72 +1,93 @@
-import { Button, Picture } from '@component';
 
-## 1. pakcages 폴더 생성
-```bash
-mkdir packages
+
+
+## 📋 프로젝트 구조
+
+```
+ReactNative_Synapse/
+├── .git/                    # Git 저장소
+├── .gitignore
+├── .gitattributes  
+├── package.json             # 루트 package.json (yarn workspace 설정)
+├── apps/
+│   └── mobile/              # TypeScript React Native 앱
+│       ├── App.tsx          # TypeScript 메인 파일
+│       ├── tsconfig.json    # TypeScript 설정
+│       ├── ios/             # iOS 네이티브 코드
+│       └── android/         # Android 네이티브 코드
+└── node_modules/
 ```
 
-## 2. Yarn 프로젝트 생성
+## 설치 과정
+
+### 1. 프로젝트 생성
 
 ```bash
-yarn init -y
+mkdir ReactNative_Synapse
+cd ReactNative_Synapse
 ```
 
-## 3. package.json 수정
+루트 `package.json` 생성
 ```json
 {
-  "private": "true",
-  "name": "프로젝트 이름",
+  "name": "synapse-monorepo",
   "version": "1.0.0",
+  "private": true,
   "workspaces": [
-    "packages/*"
-  ]
+    "apps/*"
+  ],
+  "scripts": {
+    "ios": "yarn workspace mobile ios",
+    "android": "yarn workspace mobile android",
+    "start": "yarn workspace mobile start",
+    "web": "yarn workspace mobile web"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  }
 }
 ```
 
-## 4. React Native 프로젝트 생성 (packages 폴더에서 실행)
+### 2. React Native 프로젝트 생성
 
-```sh
-npx @react-native-community/cli init synapse --directory mobile --template react-native-template-typescript@latest
-```
+> 절대 템플릿을 사용하지 말 것. 오류남
 
-## 5. iOS 셋팅
-
-##### 1. Podfile 수정
-```js
-require_relative '../node_modules/react-native/scripts/react_native_pods'
-require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
-```
-위의 내용을 아래와 같이 수정
-```js
-require_relative '../../../node_modules/react-native/scripts/react_native_pods'
-require_relative '../../../node_modules/@react-native-community/cli-platform-ios/native_modules'
-```
-
-##### 2. pod install 수행
 ```bash
-pod install
+npx --yes @react-native-community/cli@latest init mobile
 ```
 
-##### 3. Xcode를 열고 경로 변경
+### 3. iOS 설정
 ```bash
-cd packages/mobile/ios
-open xxx.xcworkspace
+cd mobile/ios
+bundle install
+bundle exec pod install
 ```
 
-`Project settings > Build Phases open “Bundle React Native code and images”` 펼치기
+### 4. 앱 실행
+```bash
+cd ../../..  # 루트 디렉토리로 이동
+yarn ios     # iOS 앱 실행
+```
 
-아래와 같이 내용 수정
+### 5. 메트로 설정 변경
+```js
+// apps/mobileApp/metro.config.js
+const {getDefaultConfig, mergeConfig} = require('@react-native/metro-config');
+const path = require('path');
 
-<Picture src={'/img/Xcode세팅.png'} width={'700px'}/>
-
-## 6. 안드로이드 셋팅
-
-### 1. build.gradle 수정
-
-```kotlin
-// packages/mobile/android/app/build.gradle
-
-react { 
-  hermesCommand = "../../node_modules/react-native/sdks/hermesc/%OS-BIN%/hermesc"
-}
+/**
+ * Metro configuration
+ * <https://reactnative.dev/docs/metro>
+ *
+ * @type {import('metro-config').MetroConfig}
+ */
+const config = {
+  resolver: {
+    unstable_enableSymlinks: true, // this enable the use of Symlinks
+  },
+  // this specifies the folder where are located the node_modules for the project
+  watchFolders: [path.join(__dirname, '..', '..')],
+};
+module.exports = mergeConfig(getDefaultConfig(__dirname), config);
 ```

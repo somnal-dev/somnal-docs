@@ -1,0 +1,35 @@
+---
+title: "UnCaght Error: Element type is invalid"
+---
+
+```bash
+Uncaught Error: Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: undefined. You likely forgot to export your component from the file it's defined in, or you might have mixed up default and named imports.
+```
+
+## 원인
+
+아래와 같은 코드를 작성 후
+
+```tsx
+import React from 'react';
+
+const MyComponent = () => {
+  return <div>My Component</div>;
+};
+
+export default MyComponent;
+```
+
+임포트 하는 곳에서 아래와 같이 작성 시 오류 발생
+
+```tsx
+import { MyComponent } from './MyComponent';
+```
+
+## 해결방법
+
+아래와 같이 올바르게 임포트
+
+```tsx
+import MyComponent from './MyComponent';
+```

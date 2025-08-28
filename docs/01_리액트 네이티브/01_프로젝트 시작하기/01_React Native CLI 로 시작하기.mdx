@@ -1,10 +1,41 @@
 
 ## 프로젝트 생성
+
+> yarn dlx 는 version berry 에서만 동작해요.
+
 ```bash
-yarn dlx @react-native-community/cli@latest init mobile
+npx @react-native-community/cli@latest init mobile
 ```
 
 ## ios 의존성 설치
-```
+
+```bash
 cd ios && pod install
+```
+
+## react-navigation/native 설치
+
+```bash
+yarn add @react-navigation/native
+```
+
+의존되는 패키지 2개 설치
+
+```bash
+yarn add react-native-screens react-native-safe-area-context
+```
+
+### 안드로이드 설정
+
+> MainActivity.kt 에 아래 내용 추가
+```kotlin
+// import 추가
+import android.os.Bundle
+
+// (... 중략 ...)
+
+// onCreate 상속
+override fun onCreate(savedInstanceState: Bundle?) {
+  super.onCreate(null)
+}
 ```

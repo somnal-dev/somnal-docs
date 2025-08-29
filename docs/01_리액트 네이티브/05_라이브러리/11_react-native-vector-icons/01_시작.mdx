@@ -1,0 +1,22 @@
+벡터 아이콘을 빠르고 쉽게 사용할 수 있게 도와주는 라이브러리에요.
+
+## 설치
+```bash
+yarn add react-native-vector-icons
+```
+## iOS 설정
+
+> Info.plist 의 맨 마지막 &lt;/dict&gt; 를 찾아 바로 위에 UIAppFonts 항목을 추가해주세요.
+```xml
+...
+
+<key>UIViewControllerBasedStatusBarAppearance</key>
+<false/>
+
+<key>UIAppFonts</key>
+<array>
+    <string>MaterialIcons.ttf</string>
+</array>
+
+</dict>
+```

@@ -8,7 +8,7 @@ view config getter callback for component style must be a function (received und
 
 ## 원인
 
-리액트 네이티브에서는 "@emotion/styled" 사용 시 오류 발생
+리액트 네이티브에서는 "@emotion/styled" 사용 시 오류가 발생해요.
 
 ```tsx
 import styled from '@emotion/styled';
@@ -22,7 +22,7 @@ export default StyledComponent;
 
 ## 해결방법
 
-"@emotion/styled" 대신 "@emotion/native" 사용
+"@emotion/styled" 대신 "@emotion/native" 사용하면 오류가 발생하지 않아요.
 
 ```tsx
 import styled from '@emotion/native';

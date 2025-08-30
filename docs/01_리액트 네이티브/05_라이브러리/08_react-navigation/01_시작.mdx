@@ -1,2 +1,36 @@
 
 `@react-navigation/native` 는 라우팅과 관련된 기능을 제공하는 라이브러리에요.
+
+## 설치
+```bash
+yarn add @react-navigation/native
+```
+
+`@react-navigation/native` 는 아래의 패키지에 대한 의존성이 있어요.<br/>
+아래의 패키지도 반드시 설치해야 해요.
+
+```bash
+yarn add react-native-screens react-native-safe-area-context
+```
+
+ios의 경우 `pod install` 명령 실행이 필요해요.
+
+## 라이브러리 적용
+
+`@react-navigation/native` 이용을 위해서는 `NavigationContainer`로 앱 전체를 감싸주어야 해요.
+
+```tsx
+
+//...
+
+const App = () => {
+    return (
+        <NavigationContainer>
+            {/** 내용 **/}
+        </NavigationContainer>
+    )
+}
+
+//...
+
+```

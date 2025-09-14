@@ -1,0 +1,98 @@
+
+## Android
+
+### SHA-1 키 얻기
+
+```bash
+keytool -J-DUser.languages=en -list -v -alias androiddebugkey -keystore ./android/app/debug.keystore
+```
+비밀번호를 묻는 프롬프트가 나오면 바로 엔터를 눌러주세요.
+
+### google-services.json 파일
+
+`/app` 폴더 밑에 `google-services.json` 파일을 위치시켜 주세요.
+
+### 프로젝트 수준 build.gradle 수정
+
+`/build.gradle` 파일을 아래와 같이 수정해주세요.
+
+```kotlin
+buildscript {
+    // ...
+    dependencies {
+        classpath("com.android.tools.build:gradle")
+        classpath("com.facebook.react:react-native-gradle-plugin")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin")
+
+        // 구글 서비스 관련 내용 추가
+        classpath("com.google.gms:google-services:4.3.10")
+    }
+    // ...
+}
+
+apply plugin: "com.facebook.react.rootproject"
+
+```
+
+### 앱 수준 build.gradle 수정
+
+`/app/build.gradle` 파일을 아래와 같이 수정해주세요.
+
+```kotlin
+apply plugin: "com.android.application"
+apply plugin: "org.jetbrains.kotlin.android"
+apply plugin: "com.facebook.react"
+
+// 구글 서비스 관련 내용 추가
+apply plugin: "com.google.gms.google-services"
+
+// ...
+
+android {
+    // ...
+    defaultConfig {
+
+        // ...
+
+        // 멀티덱스 사용관련 내용 추가
+        multiDexEnabled true
+    }
+
+    // ...
+}
+
+dependencies {
+    implementation("com.facebook.react:react-android")
+
+    // 파이어베이스 관련 내용 추가
+    implementation platform("com.google.firebase:firebase-bom:28.4.0")
+
+    // ...
+}
+
+```
+
+## iOS
+
+### GoogleService-Info.plist 파일
+
+Firebase Console 에서 다운받은 `GoogleService-Info.plist` 파일을 `Info.plist` 파일과 동일한 위치에 위치시켜 주세요.
+
+### Podfile 수정
+
+```swift
+
+// 추가
+use_modular_headers!
+
+target '앱 이름' do
+  config = use_native_modules!
+
+  // 추가
+  pod 'FirebaseAuth'
+  pod 'FirebaseFirestore'
+  pod 'FirebaseStorage'
+
+  // ...
+end
+```

@@ -23,3 +23,19 @@ yarn add --dev @types/react-native-vector-icons
 ```
 
 그 후, 다시한번 `pod install` 후 빌드를 진행해주세요.
+
+
+
+
+## Android 설정
+
+> /app/build.gradle 파일을 수정해주세요.
+
+```python
+project.ext.vectoricons = [
+    iconFontNames: ['MaterialIcons.ttf']
+]
+
+apply from '../../node_modules/react-native-vector-icons/fonts.gradle'
+
+```

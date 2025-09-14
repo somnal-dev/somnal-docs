@@ -1,0 +1,41 @@
+## 참고
+
+[https://lasbe.tistory.com/189](https://lasbe.tistory.com/189)
+
+## 1. 프로젝트 생성
+
+`vite`를 통해 React + Typescript 프로젝트를 생성해요.
+
+```bash
+yarn create vite
+```
+
+## 2. Electron 관련 패키지 설치
+
+Electron 개발에 필요한 패키지를 설치해요.
+
+```bash
+yarn add electron-is-dev
+yarn add -D electron electron-builder concurrently cross-env wait-on 
+```
+
+위의 패키지별 역할은 아래와 같아요.
+
+- electron-is-dev<br/>
+개발 환경인지, 프로덕션 환경인지 구분하는 패키지에요.
+
+- electron<br/>
+일렉트론 패키지에요.
+
+- electron-builder<br/>
+일렉트론을 패키징하여 설치파일로 만들어주는 패키지에요.
+
+- concurrently<br/>
+두 개 이상의 명령어를 하나의 스크립트에서 실행할 수 있도록 도와주는 패키지에요.
+
+- cross-env<br/>
+OS별로 다른 환경변수 설정을 통일시켜주는 패키지에요.
+
+- wait-on<br/>
+delay 의 역할을 하는 패키지에요.
+

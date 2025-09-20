@@ -1,0 +1,21 @@
+
+## 특정 스키마에 대한 권한 부여
+
+아래의 명령어를 통해 특정 스키마에 대한 사용자 권한을 설정할 수 있어요.
+
+```sql
+GRANT 권한 ON SCHEMA 스키마명 TO 사용자명
+```
+
+예를 들어, `public` 스키마에 `테이블 생성` 권한을 부여하려면,<br/>
+아래와 같이 입력해요.
+
+```sql
+GRANT CREATE ON SCHEMA public TO 사용자명
+```
+
+혹은 스키마 내 모든 테이블에 대해 모든 권한을 부여하려면 아래와 같이 입력해요.
+
+```sql
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO 사용자명;
+```

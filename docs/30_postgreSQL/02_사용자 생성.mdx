@@ -1,0 +1,18 @@
+아래의 명령어를 통해 사용자를 생성할 수 있어요.
+
+```sql
+CREATE USER 사용자명 WITH 권한옵션들 PASSWORD '비밀번호';
+```
+
+권한 옵션은 아래와 같아요.
+
+LOGIN - 로그인 허용
+CREATEDB - 데이터베이스 생성 권한
+CREATEROLE - 역할(사용자) 생성 권한
+SUPERUSER - 슈퍼유저 권한
+REPLICATION - 복제 권한
+
+예를 들어, 테이블 생성 권한을 가진 유저를 생성하려면 아래와 같이 입력해요.
+```sql
+CREATE USER 사용자명 WITH CREATEDB PASSWORD '비밀번호';
+```

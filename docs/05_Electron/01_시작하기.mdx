@@ -39,3 +39,14 @@ OS별로 다른 환경변수 설정을 통일시켜주는 패키지에요.
 - wait-on<br/>
 delay 의 역할을 하는 패키지에요.
 
+## 3. package.json 수정
+
+```json
+"react-start": "vite",
+"react-build": "tsc -b && vite build",
+"start": "concurrently \"cross-env NODE_ENV=development BROWSER=none yarn react-start\" \"wait-on http://localhost:5173 && electron .\"",
+"build": "yarn react-build && electron-builder",
+"build:win": "yarn react-build && electron-builder --win --x64",
+"lint": "eslint .",
+"preview": "vite preview"
+```

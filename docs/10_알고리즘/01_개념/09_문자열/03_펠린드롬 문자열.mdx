@@ -1,0 +1,66 @@
+
+## 일반적인 방법
+
+```js
+function isPalindrome(str) {
+    const cleaned = str.toLowerCase().replace(/[^a-z0-9]/g, '');
+    return cleaned === cleaned.split('').reverse().join('');
+}
+```
+
+## 투 포인터 방법 ( 더 빠름 )
+
+```js
+function isPalindrome(str) {
+    const cleaned = str.toLowerCase().replace(/[^a-z0-9]/g, '');
+    let left = 0;
+    let right = cleaned.length - 1;
+    
+    while (left < right) {
+        if (cleaned[left] !== cleaned[right]) {
+            return false;
+        }
+        left++;
+        right--;
+    }
+    
+    return true;
+}
+```
+
+## 가장 긴 팰린드롬 문자열 찾기
+
+```js
+function longestPalindrome(s) {
+    // s 가 널이거나 길이가 1인경우 s를 리턴
+    if(!s || s.length < 2) return s;
+
+    let start = 0;
+    let maxLength = 1;
+
+    function center(left, right) {
+        // left 와 rigth 가 유효한 범위내에 있고, left 와 right 의 문자열이 같을 경우만 반복
+        while(0 <= left && right < s.length && s[left] === s[right]) {
+            const currentLength = right - left + 1;
+
+            // 현재 길이가 더 길 경우 (가장 긴걸 찾아야 하므로)
+            if(currentLength > maxLength) {
+                start = left;
+                maxLength = currentLength;
+            }
+
+            left--;
+            right++;
+        }
+    }
+
+    for(let i=0; i < s.length; i++) {
+        // 홀수 길이인 문자열에 대해서만 취급가능
+        center(i, i);
+        // 짝수 길이인 문자열에 대하서만 취급가능
+        center(i, i+1);
+    }
+
+    return s.substring(start, start + maxLength);
+}
+```

@@ -1,0 +1,741 @@
+# 문자열 알고리즘
+
+## 문자열 알고리즘이란?
+
+문자열 알고리즘은 텍스트를 처리하고 분석하는 방법들입니다.
+
+마치 책에서 특정 단어를 찾거나, 문장을 분석하는 것과 같습니다.
+- 패턴 매칭: 특정 문자열 찾기
+- 문자열 변환: 한 문자열을 다른 문자열로 바꾸기
+- 문자열 분석: 문자열의 특성 파악하기
+
+```
+예시:
+텍스트: "Hello World Programming"
+패턴: "World"
+결과: 인덱스 6에서 발견
+```
+
+## 기본 패턴 매칭
+
+### 단순한 문자열 검색
+
+```javascript
+// 가장 기본적인 방법
+function naiveStringSearch(text, pattern) {
+    const positions = [];
+    
+    for (let i = 0; i <= text.length - pattern.length; i++) {
+        let match = true;
+        
+        for (let j = 0; j < pattern.length; j++) {
+            if (text[i + j] !== pattern[j]) {
+                match = false;
+                break;
+            }
+        }
+        
+        if (match) {
+            positions.push(i);
+        }
+    }
+    
+    return positions;
+}
+
+// 첫 번째 매치만 찾기
+function findFirst(text, pattern) {
+    for (let i = 0; i <= text.length - pattern.length; i++) {
+        let match = true;
+        
+        for (let j = 0; j < pattern.length; j++) {
+            if (text[i + j] !== pattern[j]) {
+                match = false;
+                break;
+            }
+        }
+        
+        if (match) return i;
+    }
+    
+    return -1;
+}
+
+const text = "AABAACAADAABAABA";
+const pattern = "AABA";
+console.log(naiveStringSearch(text, pattern)); // [0, 9, 12]
+console.log(findFirst(text, pattern)); // 0
+```
+
+### JavaScript 내장 메서드와 비교
+
+```javascript
+function compareStringSearchMethods() {
+    const longText = "A".repeat(10000) + "PATTERN" + "B".repeat(10000);
+    const pattern = "PATTERN";
+    const iterations = 1000;
+    
+    // 단순 검색
+    let start = performance.now();
+    for (let i = 0; i < iterations; i++) {
+        naiveStringSearch(longText, pattern);
+    }
+    let end = performance.now();
+    const naiveTime = end - start;
+    
+    // JavaScript 내장 indexOf
+    start = performance.now();
+    for (let i = 0; i < iterations; i++) {
+        longText.indexOf(pattern);
+    }
+    end = performance.now();
+    const indexOfTime = end - start;
+    
+    // JavaScript 내장 includes
+    start = performance.now();
+    for (let i = 0; i < iterations; i++) {
+        longText.includes(pattern);
+    }
+    end = performance.now();
+    const includesTime = end - start;
+    
+    // 정규식
+    const regex = new RegExp(pattern, 'g');
+    start = performance.now();
+    for (let i = 0; i < iterations; i++) {
+        [...longText.matchAll(regex)];
+    }
+    end = performance.now();
+    const regexTime = end - start;
+    
+    console.log(`단순 검색: ${naiveTime.toFixed(2)}ms`);
+    console.log(`indexOf: ${indexOfTime.toFixed(2)}ms`);
+    console.log(`includes: ${includesTime.toFixed(2)}ms`);
+    console.log(`정규식: ${regexTime.toFixed(2)}ms`);
+}
+```
+
+> JavaScript 내장 메서드들이 훨씬 빠릅니다
+
+## KMP 알고리즘
+
+KMP(Knuth-Morris-Pratt) 알고리즘은 실패 함수를 사용해서 효율적으로 패턴을 찾는 방법입니다.
+
+### 실패 함수 구성
+
+```javascript
+function buildFailureFunction(pattern) {
+    const failure = Array(pattern.length).fill(0);
+    let j = 0;
+    
+    for (let i = 1; i < pattern.length; i++) {
+        while (j > 0 && pattern[i] !== pattern[j]) {
+            j = failure[j - 1];
+        }
+        
+        if (pattern[i] === pattern[j]) {
+            j++;
+        }
+        
+        failure[i] = j;
+    }
+    
+    return failure;
+}
+
+// 실패 함수 시각화
+function visualizeFailureFunction(pattern) {
+    const failure = buildFailureFunction(pattern);
+    
+    console.log(`패턴: ${pattern}`);
+    console.log(`인덱스: ${pattern.split('').map((_, i) => i).join(' ')}`);
+    console.log(`실패함수: ${failure.join(' ')}`);
+    
+    return failure;
+}
+
+visualizeFailureFunction("AABAACAAB");
+// 패턴: AABAACAAB
+// 인덱스: 0 1 2 3 4 5 6 7 8
+// 실패함수: 0 1 0 1 2 0 1 2 3
+```
+
+### KMP 검색 구현
+
+```javascript
+function kmpSearch(text, pattern) {
+    const failure = buildFailureFunction(pattern);
+    const matches = [];
+    let j = 0;
+    
+    for (let i = 0; i < text.length; i++) {
+        while (j > 0 && text[i] !== pattern[j]) {
+            j = failure[j - 1];
+        }
+        
+        if (text[i] === pattern[j]) {
+            j++;
+        }
+        
+        if (j === pattern.length) {
+            matches.push(i - pattern.length + 1);
+            j = failure[j - 1];
+        }
+    }
+    
+    return matches;
+}
+
+console.log(kmpSearch("AABAACAADAABAABA", "AABA")); // [0, 9, 12]
+```
+
+### 성능 비교
+
+```javascript
+function comparePatternMatching() {
+    // 최악의 경우를 만드는 텍스트와 패턴
+    const worstCaseText = "A".repeat(1000) + "B";
+    const worstCasePattern = "A".repeat(10) + "B";
+    
+    // 일반적인 경우
+    const normalText = "Lorem ipsum dolor sit amet consectetur adipiscing elit";
+    const normalPattern = "consectetur";
+    
+    function testAlgorithm(text, pattern, name) {
+        console.log(`\n=== ${name} ===`);
+        
+        let start = performance.now();
+        const naiveResult = naiveStringSearch(text, pattern);
+        let end = performance.now();
+        const naiveTime = end - start;
+        
+        start = performance.now();
+        const kmpResult = kmpSearch(text, pattern);
+        end = performance.now();
+        const kmpTime = end - start;
+        
+        start = performance.now();
+        const indexOfResult = [];
+        let index = text.indexOf(pattern);
+        while (index !== -1) {
+            indexOfResult.push(index);
+            index = text.indexOf(pattern, index + 1);
+        }
+        end = performance.now();
+        const indexOfTime = end - start;
+        
+        console.log(`단순 검색: ${naiveTime.toFixed(4)}ms, 결과: [${naiveResult.join(', ')}]`);
+        console.log(`KMP: ${kmpTime.toFixed(4)}ms, 결과: [${kmpResult.join(', ')}]`);
+        console.log(`indexOf: ${indexOfTime.toFixed(4)}ms, 결과: [${indexOfResult.join(', ')}]`);
+    }
+    
+    testAlgorithm(worstCaseText, worstCasePattern, "최악의 경우");
+    testAlgorithm(normalText, normalPattern, "일반적인 경우");
+}
+```
+
+> 일반적으로는 JavaScript 내장 메서드가 가장 빠르지만, KMP는 최악의 경우에서 우수한 성능을 보입니다
+
+## 라빈-카프 알고리즘
+
+해시를 사용해서 패턴을 찾는 방법입니다.
+
+```javascript
+function rabinKarpSearch(text, pattern, prime = 101) {
+    const patternLength = pattern.length;
+    const textLength = text.length;
+    const base = 256; // 문자 집합 크기
+    
+    let patternHash = 0;
+    let textHash = 0;
+    let h = 1;
+    const matches = [];
+    
+    // h = pow(base, patternLength-1) % prime
+    for (let i = 0; i < patternLength - 1; i++) {
+        h = (h * base) % prime;
+    }
+    
+    // 패턴과 첫 번째 윈도우의 해시 계산
+    for (let i = 0; i < patternLength; i++) {
+        patternHash = (base * patternHash + pattern.charCodeAt(i)) % prime;
+        textHash = (base * textHash + text.charCodeAt(i)) % prime;
+    }
+    
+    // 슬라이딩 윈도우로 텍스트 검색
+    for (let i = 0; i <= textLength - patternLength; i++) {
+        // 해시가 같으면 실제 문자열 비교
+        if (patternHash === textHash) {
+            let match = true;
+            for (let j = 0; j < patternLength; j++) {
+                if (text[i + j] !== pattern[j]) {
+                    match = false;
+                    break;
+                }
+            }
+            if (match) {
+                matches.push(i);
+            }
+        }
+        
+        // 다음 윈도우의 해시 계산 (롤링 해시)
+        if (i < textLength - patternLength) {
+            textHash = (base * (textHash - text.charCodeAt(i) * h) + 
+                       text.charCodeAt(i + patternLength)) % prime;
+            
+            // 음수가 될 수 있으므로 보정
+            if (textHash < 0) {
+                textHash += prime;
+            }
+        }
+    }
+    
+    return matches;
+}
+
+console.log(rabinKarpSearch("AABAACAADAABAABA", "AABA")); // [0, 9, 12]
+```
+
+## 문자열 변환 알고리즘
+
+### 편집 거리 (레벤슈타인 거리)
+
+```javascript
+function editDistance(str1, str2) {
+    const m = str1.length;
+    const n = str2.length;
+    
+    // DP 테이블 초기화
+    const dp = Array(m + 1).fill().map(() => Array(n + 1).fill(0));
+    
+    // 첫 번째 행과 열 초기화
+    for (let i = 0; i <= m; i++) dp[i][0] = i;
+    for (let j = 0; j <= n; j++) dp[0][j] = j;
+    
+    // DP 테이블 채우기
+    for (let i = 1; i <= m; i++) {
+        for (let j = 1; j <= n; j++) {
+            if (str1[i - 1] === str2[j - 1]) {
+                dp[i][j] = dp[i - 1][j - 1]; // 같으면 변경 불필요
+            } else {
+                dp[i][j] = Math.min(
+                    dp[i - 1][j] + 1,     // 삭제
+                    dp[i][j - 1] + 1,     // 삽입
+                    dp[i - 1][j - 1] + 1  // 교체
+                );
+            }
+        }
+    }
+    
+    return dp[m][n];
+}
+
+// 편집 과정 추적
+function editDistanceWithPath(str1, str2) {
+    const m = str1.length;
+    const n = str2.length;
+    const dp = Array(m + 1).fill().map(() => Array(n + 1).fill(0));
+    const operations = [];
+    
+    // 초기화
+    for (let i = 0; i <= m; i++) dp[i][0] = i;
+    for (let j = 0; j <= n; j++) dp[0][j] = j;
+    
+    // DP 계산
+    for (let i = 1; i <= m; i++) {
+        for (let j = 1; j <= n; j++) {
+            if (str1[i - 1] === str2[j - 1]) {
+                dp[i][j] = dp[i - 1][j - 1];
+            } else {
+                dp[i][j] = Math.min(
+                    dp[i - 1][j] + 1,
+                    dp[i][j - 1] + 1,
+                    dp[i - 1][j - 1] + 1
+                );
+            }
+        }
+    }
+    
+    // 경로 추적
+    let i = m, j = n;
+    while (i > 0 || j > 0) {
+        if (i > 0 && j > 0 && str1[i - 1] === str2[j - 1]) {
+            i--; j--;
+        } else if (i > 0 && j > 0 && dp[i][j] === dp[i - 1][j - 1] + 1) {
+            operations.unshift(`교체: ${str1[i - 1]} → ${str2[j - 1]} (위치 ${i - 1})`);
+            i--; j--;
+        } else if (i > 0 && dp[i][j] === dp[i - 1][j] + 1) {
+            operations.unshift(`삭제: ${str1[i - 1]} (위치 ${i - 1})`);
+            i--;
+        } else if (j > 0 && dp[i][j] === dp[i][j - 1] + 1) {
+            operations.unshift(`삽입: ${str2[j - 1]} (위치 ${i})`);
+            j--;
+        }
+    }
+    
+    return {
+        distance: dp[m][n],
+        operations: operations
+    };
+}
+
+console.log(editDistance("kitten", "sitting")); // 3
+const result = editDistanceWithPath("kitten", "sitting");
+console.log(result);
+// {distance: 3, operations: ["교체: k → s (위치 0)", "교체: e → i (위치 4)", "삽입: g (위치 6)"]}
+```
+
+### 최장 공통 부분 문자열
+
+```javascript
+function longestCommonSubstring(str1, str2) {
+    const m = str1.length;
+    const n = str2.length;
+    const dp = Array(m + 1).fill().map(() => Array(n + 1).fill(0));
+    
+    let maxLength = 0;
+    let endingPos = 0;
+    
+    for (let i = 1; i <= m; i++) {
+        for (let j = 1; j <= n; j++) {
+            if (str1[i - 1] === str2[j - 1]) {
+                dp[i][j] = dp[i - 1][j - 1] + 1;
+                if (dp[i][j] > maxLength) {
+                    maxLength = dp[i][j];
+                    endingPos = i;
+                }
+            }
+        }
+    }
+    
+    return {
+        length: maxLength,
+        substring: str1.substring(endingPos - maxLength, endingPos)
+    };
+}
+
+console.log(longestCommonSubstring("GeeksforGeeks", "GeeksQuiz"));
+// {length: 5, substring: "Geeks"}
+```
+
+## 문자열 분석
+
+### 팰린드롬 검사
+
+```javascript
+// 단순한 방법
+function isPalindrome(str) {
+    const cleaned = str.toLowerCase().replace(/[^a-z0-9]/g, '');
+    return cleaned === cleaned.split('').reverse().join('');
+}
+
+// 투 포인터 방법 (더 효율적)
+function isPalindromeOptimized(str) {
+    const cleaned = str.toLowerCase().replace(/[^a-z0-9]/g, '');
+    let left = 0;
+    let right = cleaned.length - 1;
+    
+    while (left < right) {
+        if (cleaned[left] !== cleaned[right]) {
+            return false;
+        }
+        left++;
+        right--;
+    }
+    
+    return true;
+}
+
+// 가장 긴 팰린드롬 부분 문자열 찾기
+function longestPalindrome(s) {
+    if (!s || s.length < 2) return s;
+    
+    let start = 0;
+    let maxLength = 1;
+    
+    function expandAroundCenter(left, right) {
+        while (left >= 0 && right < s.length && s[left] === s[right]) {
+            const currentLength = right - left + 1;
+            if (currentLength > maxLength) {
+                start = left;
+                maxLength = currentLength;
+            }
+            left--;
+            right++;
+        }
+    }
+    
+    for (let i = 0; i < s.length; i++) {
+        expandAroundCenter(i, i);     // 홀수 길이 팰린드롬
+        expandAroundCenter(i, i + 1); // 짝수 길이 팰린드롬
+    }
+    
+    return s.substring(start, start + maxLength);
+}
+
+console.log(isPalindrome("A man, a plan, a canal: Panama")); // true
+console.log(longestPalindrome("babad")); // "bab" 또는 "aba"
+```
+
+### 애너그램 검사
+
+```javascript
+function isAnagram(str1, str2) {
+    if (str1.length !== str2.length) return false;
+    
+    const count = {};
+    
+    // 첫 번째 문자열의 문자 개수 세기
+    for (let char of str1) {
+        count[char] = (count[char] || 0) + 1;
+    }
+    
+    // 두 번째 문자열의 문자 개수 빼기
+    for (let char of str2) {
+        if (!count[char]) return false;
+        count[char]--;
+    }
+    
+    return true;
+}
+
+// 그룹화
+function groupAnagrams(strs) {
+    const groups = {};
+    
+    for (let str of strs) {
+        const sorted = str.split('').sort().join('');
+        if (!groups[sorted]) {
+            groups[sorted] = [];
+        }
+        groups[sorted].push(str);
+    }
+    
+    return Object.values(groups);
+}
+
+console.log(isAnagram("listen", "silent")); // true
+console.log(groupAnagrams(["eat", "tea", "tan", "ate", "nat", "bat"]));
+// [["eat", "tea", "ate"], ["tan", "nat"], ["bat"]]
+```
+
+## 고급 문자열 알고리즘
+
+### 접미사 배열 (Suffix Array)
+
+```javascript
+function buildSuffixArray(str) {
+    const suffixes = [];
+    
+    // 모든 접미사 생성
+    for (let i = 0; i < str.length; i++) {
+        suffixes.push({
+            suffix: str.substring(i),
+            index: i
+        });
+    }
+    
+    // 접미사들을 사전순으로 정렬
+    suffixes.sort((a, b) => a.suffix.localeCompare(b.suffix));
+    
+    return suffixes.map(item => item.index);
+}
+
+// 접미사 배열을 이용한 패턴 검색
+function searchWithSuffixArray(str, pattern) {
+    const suffixArray = buildSuffixArray(str);
+    const matches = [];
+    
+    for (let i of suffixArray) {
+        if (str.substring(i, i + pattern.length) === pattern) {
+            matches.push(i);
+        }
+    }
+    
+    return matches.sort((a, b) => a - b);
+}
+
+const text = "banana";
+console.log(buildSuffixArray(text)); // [5, 3, 1, 0, 4, 2]
+console.log(searchWithSuffixArray(text, "ana")); // [1, 3]
+```
+
+### Z 알고리즘
+
+```javascript
+function zAlgorithm(str) {
+    const n = str.length;
+    const z = Array(n).fill(0);
+    let left = 0, right = 0;
+    
+    for (let i = 1; i < n; i++) {
+        if (i <= right) {
+            z[i] = Math.min(right - i + 1, z[i - left]);
+        }
+        
+        while (i + z[i] < n && str[z[i]] === str[i + z[i]]) {
+            z[i]++;
+        }
+        
+        if (i + z[i] - 1 > right) {
+            left = i;
+            right = i + z[i] - 1;
+        }
+    }
+    
+    return z;
+}
+
+// Z 알고리즘을 이용한 패턴 검색
+function zPatternSearch(text, pattern) {
+    const combined = pattern + '$' + text;
+    const z = zAlgorithm(combined);
+    const matches = [];
+    
+    for (let i = 0; i < z.length; i++) {
+        if (z[i] === pattern.length) {
+            matches.push(i - pattern.length - 1);
+        }
+    }
+    
+    return matches;
+}
+
+console.log(zPatternSearch("AABAACAADAABAABA", "AABA")); // [0, 9, 12]
+```
+
+## 실제 문제 응용
+
+### 문자열 압축
+
+```javascript
+function compressString(str) {
+    if (!str) return str;
+    
+    let compressed = '';
+    let count = 1;
+    
+    for (let i = 1; i < str.length; i++) {
+        if (str[i] === str[i - 1]) {
+            count++;
+        } else {
+            compressed += str[i - 1] + count;
+            count = 1;
+        }
+    }
+    
+    compressed += str[str.length - 1] + count;
+    
+    return compressed.length < str.length ? compressed : str;
+}
+
+console.log(compressString("aabcccccaaa")); // "a2b1c5a3"
+console.log(compressString("abc")); // "abc" (압축하면 더 길어짐)
+```
+
+### 단어 패턴 매칭
+
+```javascript
+function wordPattern(pattern, str) {
+    const words = str.split(' ');
+    
+    if (pattern.length !== words.length) return false;
+    
+    const charToWord = {};
+    const wordToChar = {};
+    
+    for (let i = 0; i < pattern.length; i++) {
+        const char = pattern[i];
+        const word = words[i];
+        
+        if (charToWord[char] && charToWord[char] !== word) return false;
+        if (wordToChar[word] && wordToChar[word] !== char) return false;
+        
+        charToWord[char] = word;
+        wordToChar[word] = char;
+    }
+    
+    return true;
+}
+
+console.log(wordPattern("abba", "dog cat cat dog")); // true
+console.log(wordPattern("abba", "dog cat cat fish")); // false
+```
+
+## 성능 최적화 팁
+
+```javascript
+function stringOptimizationTips() {
+    console.log("문자열 처리 최적화 팁:");
+    
+    console.log("\n1. 문자열 연결:");
+    console.log("❌ 느린 방법: str += char (반복문에서)");
+    console.log("✅ 빠른 방법: array.push(char), array.join('')");
+    
+    console.log("\n2. 문자열 검색:");
+    console.log("❌ indexOf를 반복 호출");
+    console.log("✅ 정규식 matchAll 또는 전용 알고리즘");
+    
+    console.log("\n3. 대소문자 변환:");
+    console.log("❌ 매번 toLowerCase() 호출");
+    console.log("✅ 미리 변환하거나 charCode 비교");
+    
+    console.log("\n4. 문자열 분할:");
+    console.log("❌ 불필요한 split() 사용");
+    console.log("✅ 인덱스 기반 접근");
+}
+
+// 문자열 연결 성능 비교
+function compareStringConcatenation() {
+    const iterations = 10000;
+    
+    // 방법 1: += 연산자
+    let start = performance.now();
+    let str1 = '';
+    for (let i = 0; i < iterations; i++) {
+        str1 += 'a';
+    }
+    let end = performance.now();
+    const plusTime = end - start;
+    
+    // 방법 2: 배열 + join
+    start = performance.now();
+    const arr = [];
+    for (let i = 0; i < iterations; i++) {
+        arr.push('a');
+    }
+    const str2 = arr.join('');
+    end = performance.now();
+    const joinTime = end - start;
+    
+    console.log(`+= 연산자: ${plusTime.toFixed(2)}ms`);
+    console.log(`배열 + join: ${joinTime.toFixed(2)}ms`);
+}
+```
+
+> 일반적으로 JavaScript 엔진이 최적화를 잘 해주지만, 대용량 문자열 처리시에는 배열 + join이 더 효율적일 수 있습니다
+
+## 언제 어떤 알고리즘을 사용하나요?
+
+```javascript
+function chooseStringAlgorithm() {
+    console.log("문자열 알고리즘 선택 가이드:");
+    
+    console.log("\n🔍 패턴 검색:");
+    console.log("- 일반적인 경우: JavaScript 내장 메서드");
+    console.log("- 많은 패턴 검색: KMP 또는 라빈-카프");
+    console.log("- 전처리 가능한 텍스트: 접미사 배열");
+    
+    console.log("\n📝 문자열 변환:");
+    console.log("- 유사도 측정: 편집 거리");
+    console.log("- 공통 부분 찾기: LCS 알고리즘");
+    console.log("- 패턴 매칭: 정규식");
+    
+    console.log("\n🔬 문자열 분석:");
+    console.log("- 팰린드롬: 투 포인터");
+    console.log("- 애너그램: 문자 개수 비교");
+    console.log("- 패턴 분석: Z 알고리즘");
+}
+```
+
+문자열 알고리즘은 텍스트 처리, 검색 엔진, 생물정보학 등 다양한 분야에서 활용됩니다. 문제의 특성에 맞는 알고리즘을 선택하는 것이 중요합니다.

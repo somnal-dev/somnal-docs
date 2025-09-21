@@ -1,0 +1,398 @@
+# 스택(Stack)과 큐(Queue)
+
+## 스택이란?
+
+스택은 마치 접시를 쌓는 것처럼 데이터를 저장하는 방법입니다.
+
+- 가장 마지막에 넣은 것이 가장 먼저 나옵니다
+- 이를 LIFO(Last In First Out) 구조라고 합니다
+
+```
+    |   |
+    | 3 |  ← 가장 마지막에 넣은 것 (가장 먼저 나옴)
+    | 2 |
+    | 1 |  ← 가장 처음에 넣은 것 (가장 나중에 나옴)
+    +---+
+```
+
+## 스택 구현
+
+### 배열로 구현
+
+```javascript
+class Stack {
+    constructor() {
+        this.items = [];
+    }
+    
+    // 추가
+    push(item) {
+        this.items.push(item);
+    }
+    
+    // 제거
+    pop() {
+        return this.items.pop();
+    }
+    
+    // 맨 위 확인
+    peek() {
+        return this.items[this.items.length - 1];
+    }
+    
+    // 비어있는지 확인
+    isEmpty() {
+        return this.items.length === 0;
+    }
+}
+```
+
+### 연결 리스트로 구현
+
+```javascript
+class Node {
+    constructor(data) {
+        this.data = data;
+        this.next = null;
+    }
+}
+
+class LinkedStack {
+    constructor() {
+        this.top = null;
+    }
+    
+    push(data) {
+        const newNode = new Node(data);
+        newNode.next = this.top;
+        this.top = newNode;
+    }
+    
+    pop() {
+        if (this.isEmpty()) return null;
+        const data = this.top.data;
+        this.top = this.top.next;
+        return data;
+    }
+    
+    peek() {
+        return this.isEmpty() ? null : this.top.data;
+    }
+    
+    isEmpty() {
+        return this.top === null;
+    }
+}
+```
+
+### 성능 비교
+
+```javascript
+function compareStackPerformance() {
+    const iterations = 1000000;
+    
+    // 배열 스택 테스트
+    const arrayStack = new Stack();
+    let start = performance.now();
+    
+    for (let i = 0; i < iterations; i++) {
+        arrayStack.push(i);
+    }
+    for (let i = 0; i < iterations; i++) {
+        arrayStack.pop();
+    }
+    
+    let end = performance.now();
+    const arrayTime = end - start;
+    
+    // 연결 리스트 스택 테스트
+    const linkedStack = new LinkedStack();
+    start = performance.now();
+    
+    for (let i = 0; i < iterations; i++) {
+        linkedStack.push(i);
+    }
+    for (let i = 0; i < iterations; i++) {
+        linkedStack.pop();
+    }
+    
+    end = performance.now();
+    const linkedTime = end - start;
+    
+    console.log(`배열 스택: ${arrayTime.toFixed(2)}ms`);
+    console.log(`연결 리스트 스택: ${linkedTime.toFixed(2)}ms`);
+    
+    return arrayTime < linkedTime ? "배열 스택" : "연결 리스트 스택";
+}
+
+// 결과: 배열 스택이 일반적으로 더 빠름
+```
+
+> 배열로 구현한 스택이 메모리 접근 패턴이 좋아서 더 빠릅니다
+
+## 큐란?
+
+큐는 마치 줄을 서는 것처럼 데이터를 저장하는 방법입니다.
+
+- 가장 먼저 넣은 것이 가장 먼저 나옵니다
+- 이를 FIFO(First In First Out) 구조라고 합니다
+
+```
+← 나가는 곳        들어가는 곳 →
+  | 1 | 2 | 3 |
+  +---+---+---+
+  먼저    나중에
+  들어옴  들어옴
+```
+
+## 큐 구현
+
+### 배열로 구현 (단순한 방법)
+
+```javascript
+class SimpleQueue {
+    constructor() {
+        this.items = [];
+    }
+    
+    // 추가
+    enqueue(item) {
+        this.items.push(item);
+    }
+    
+    // 제거
+    dequeue() {
+        return this.items.shift(); // 느림!
+    }
+    
+    front() {
+        return this.items[0];
+    }
+    
+    isEmpty() {
+        return this.items.length === 0;
+    }
+}
+```
+
+### 배열로 구현 (원형 큐)
+
+```javascript
+class CircularQueue {
+    constructor(size = 100) {
+        this.items = new Array(size);
+        this.front = 0;
+        this.rear = 0;
+        this.size = 0;
+        this.maxSize = size;
+    }
+    
+    enqueue(item) {
+        if (this.size >= this.maxSize) return false;
+        
+        this.items[this.rear] = item;
+        this.rear = (this.rear + 1) % this.maxSize;
+        this.size++;
+        return true;
+    }
+    
+    dequeue() {
+        if (this.isEmpty()) return null;
+        
+        const item = this.items[this.front];
+        this.front = (this.front + 1) % this.maxSize;
+        this.size--;
+        return item;
+    }
+    
+    peek() {
+        return this.isEmpty() ? null : this.items[this.front];
+    }
+    
+    isEmpty() {
+        return this.size === 0;
+    }
+}
+```
+
+### 연결 리스트로 구현
+
+```javascript
+class LinkedQueue {
+    constructor() {
+        this.front = null;
+        this.rear = null;
+    }
+    
+    enqueue(data) {
+        const newNode = new Node(data);
+        
+        if (this.isEmpty()) {
+            this.front = this.rear = newNode;
+        } else {
+            this.rear.next = newNode;
+            this.rear = newNode;
+        }
+    }
+    
+    dequeue() {
+        if (this.isEmpty()) return null;
+        
+        const data = this.front.data;
+        this.front = this.front.next;
+        
+        if (!this.front) {
+            this.rear = null;
+        }
+        
+        return data;
+    }
+    
+    peek() {
+        return this.isEmpty() ? null : this.front.data;
+    }
+    
+    isEmpty() {
+        return this.front === null;
+    }
+}
+```
+
+### 성능 비교
+
+```javascript
+function compareQueuePerformance() {
+    const iterations = 100000;
+    
+    // 단순 배열 큐
+    const simpleQueue = new SimpleQueue();
+    let start = performance.now();
+    
+    for (let i = 0; i < iterations; i++) {
+        simpleQueue.enqueue(i);
+    }
+    for (let i = 0; i < iterations; i++) {
+        simpleQueue.dequeue();
+    }
+    
+    let end = performance.now();
+    const simpleTime = end - start;
+    
+    // 원형 큐
+    const circularQueue = new CircularQueue(iterations * 2);
+    start = performance.now();
+    
+    for (let i = 0; i < iterations; i++) {
+        circularQueue.enqueue(i);
+    }
+    for (let i = 0; i < iterations; i++) {
+        circularQueue.dequeue();
+    }
+    
+    end = performance.now();
+    const circularTime = end - start;
+    
+    // 연결 리스트 큐
+    const linkedQueue = new LinkedQueue();
+    start = performance.now();
+    
+    for (let i = 0; i < iterations; i++) {
+        linkedQueue.enqueue(i);
+    }
+    for (let i = 0; i < iterations; i++) {
+        linkedQueue.dequeue();
+    }
+    
+    end = performance.now();
+    const linkedTime = end - start;
+    
+    console.log(`단순 배열 큐: ${simpleTime.toFixed(2)}ms`);
+    console.log(`원형 큐: ${circularTime.toFixed(2)}ms`);
+    console.log(`연결 리스트 큐: ${linkedTime.toFixed(2)}ms`);
+}
+```
+
+> 원형 큐가 가장 빠르고, 단순 배열 큐는 shift() 때문에 매우 느립니다
+
+## 언제 사용하나요?
+
+### 스택 사용 예시
+- 함수 호출 관리
+- 괄호 검사
+- 되돌리기 기능 (Undo)
+- 브라우저 뒤로가기
+
+### 큐 사용 예시
+- 프린터 작업 대기열
+- 너비 우선 탐색 (BFS)
+- 프로세스 스케줄링
+- 키보드 입력 버퍼
+
+## 실제 문제 예시
+
+### 스택으로 괄호 검사하기
+
+```javascript
+function isValidParentheses(s) {
+    const stack = [];
+    const pairs = {
+        ')': '(',
+        '}': '{',
+        ']': '['
+    };
+    
+    for (let char of s) {
+        if (char === '(' || char === '{' || char === '[') {
+            stack.push(char);
+        } else if (char === ')' || char === '}' || char === ']') {
+            if (stack.length === 0 || stack.pop() !== pairs[char]) {
+                return false;
+            }
+        }
+    }
+    
+    return stack.length === 0;
+}
+
+console.log(isValidParentheses("()")); // true
+console.log(isValidParentheses("({[]})")); // true
+console.log(isValidParentheses("({[}])")); // false
+```
+
+### 큐로 너비 우선 탐색하기
+
+```javascript
+function bfs(graph, start) {
+    const visited = new Set();
+    const queue = new LinkedQueue();
+    const result = [];
+    
+    queue.enqueue(start);
+    visited.add(start);
+    
+    while (!queue.isEmpty()) {
+        const node = queue.dequeue();
+        result.push(node);
+        
+        for (let neighbor of graph[node] || []) {
+            if (!visited.has(neighbor)) {
+                visited.add(neighbor);
+                queue.enqueue(neighbor);
+            }
+        }
+    }
+    
+    return result;
+}
+
+const graph = {
+    'A': ['B', 'C'],
+    'B': ['A', 'D', 'E'],
+    'C': ['A', 'F'],
+    'D': ['B'],
+    'E': ['B', 'F'],
+    'F': ['C', 'E']
+};
+
+console.log(bfs(graph, 'A')); // ['A', 'B', 'C', 'D', 'E', 'F']
+```

@@ -1,0 +1,1054 @@
+# 트리 알고리즘
+
+## 트리란?
+
+트리는 계층적 구조를 가진 자료구조입니다.
+
+마치 가족 관계도나 회사 조직도처럼 부모-자식 관계로 연결되어 있습니다.
+- 루트(Root): 가장 위에 있는 노드
+- 부모(Parent): 위쪽 노드
+- 자식(Children): 아래쪽 노드들
+- 잎(Leaf): 자식이 없는 노드
+
+```
+트리 예시:
+       A (루트)
+      / \
+     B   C
+    / \   \
+   D   E   F (잎 노드들)
+```
+
+## 이진 트리
+
+가장 기본적인 트리로, 각 노드가 최대 2개의 자식을 가집니다.
+
+### 이진 트리 구현
+
+```javascript
+class TreeNode {
+    constructor(val, left = null, right = null) {
+        this.val = val;
+        this.left = left;
+        this.right = right;
+    }
+}
+
+// 트리 생성 예시
+function createSampleTree() {
+    const root = new TreeNode(1);
+    root.left = new TreeNode(2);
+    root.right = new TreeNode(3);
+    root.left.left = new TreeNode(4);
+    root.left.right = new TreeNode(5);
+    root.right.left = new TreeNode(6);
+    root.right.right = new TreeNode(7);
+    
+    return root;
+}
+
+/*
+생성된 트리:
+       1
+      / \
+     2   3
+    / \ / \
+   4  5 6  7
+*/
+```
+
+### 트리 순회
+
+#### 전위 순회 (Pre-order): 루트 → 왼쪽 → 오른쪽
+
+```javascript
+function preorderTraversal(root) {
+    const result = [];
+    
+    function traverse(node) {
+        if (!node) return;
+        
+        result.push(node.val);    // 루트 방문
+        traverse(node.left);      // 왼쪽 서브트리
+        traverse(node.right);     // 오른쪽 서브트리
+    }
+    
+    traverse(root);
+    return result;
+}
+
+// 반복문 버전
+function preorderIterative(root) {
+    if (!root) return [];
+    
+    const result = [];
+    const stack = [root];
+    
+    while (stack.length > 0) {
+        const node = stack.pop();
+        result.push(node.val);
+        
+        if (node.right) stack.push(node.right);
+        if (node.left) stack.push(node.left);
+    }
+    
+    return result;
+}
+
+const tree = createSampleTree();
+console.log(preorderTraversal(tree)); // [1, 2, 4, 5, 3, 6, 7]
+```
+
+#### 중위 순회 (In-order): 왼쪽 → 루트 → 오른쪽
+
+```javascript
+function inorderTraversal(root) {
+    const result = [];
+    
+    function traverse(node) {
+        if (!node) return;
+        
+        traverse(node.left);      // 왼쪽 서브트리
+        result.push(node.val);    // 루트 방문
+        traverse(node.right);     // 오른쪽 서브트리
+    }
+    
+    traverse(root);
+    return result;
+}
+
+// 반복문 버전
+function inorderIterative(root) {
+    const result = [];
+    const stack = [];
+    let current = root;
+    
+    while (current || stack.length > 0) {
+        while (current) {
+            stack.push(current);
+            current = current.left;
+        }
+        
+        current = stack.pop();
+        result.push(current.val);
+        current = current.right;
+    }
+    
+    return result;
+}
+
+console.log(inorderTraversal(tree)); // [4, 2, 5, 1, 6, 3, 7]
+```
+
+#### 후위 순회 (Post-order): 왼쪽 → 오른쪽 → 루트
+
+```javascript
+function postorderTraversal(root) {
+    const result = [];
+    
+    function traverse(node) {
+        if (!node) return;
+        
+        traverse(node.left);      // 왼쪽 서브트리
+        traverse(node.right);     // 오른쪽 서브트리
+        result.push(node.val);    // 루트 방문
+    }
+    
+    traverse(root);
+    return result;
+}
+
+// 반복문 버전 (좀 더 복잡)
+function postorderIterative(root) {
+    if (!root) return [];
+    
+    const result = [];
+    const stack = [];
+    let lastVisited = null;
+    
+    while (stack.length > 0 || root) {
+        if (root) {
+            stack.push(root);
+            root = root.left;
+        } else {
+            const peekNode = stack[stack.length - 1];
+            if (peekNode.right && lastVisited !== peekNode.right) {
+                root = peekNode.right;
+            } else {
+                result.push(peekNode.val);
+                lastVisited = stack.pop();
+            }
+        }
+    }
+    
+    return result;
+}
+
+console.log(postorderTraversal(tree)); // [4, 5, 2, 6, 7, 3, 1]
+```
+
+#### 레벨 순회 (Level-order): 레벨별로 왼쪽부터
+
+```javascript
+function levelOrderTraversal(root) {
+    if (!root) return [];
+    
+    const result = [];
+    const queue = [root];
+    
+    while (queue.length > 0) {
+        const node = queue.shift();
+        result.push(node.val);
+        
+        if (node.left) queue.push(node.left);
+        if (node.right) queue.push(node.right);
+    }
+    
+    return result;
+}
+
+// 레벨별로 분리해서 반환
+function levelOrderByLevels(root) {
+    if (!root) return [];
+    
+    const result = [];
+    let currentLevel = [root];
+    
+    while (currentLevel.length > 0) {
+        const levelValues = [];
+        const nextLevel = [];
+        
+        for (let node of currentLevel) {
+            levelValues.push(node.val);
+            
+            if (node.left) nextLevel.push(node.left);
+            if (node.right) nextLevel.push(node.right);
+        }
+        
+        result.push(levelValues);
+        currentLevel = nextLevel;
+    }
+    
+    return result;
+}
+
+console.log(levelOrderTraversal(tree)); // [1, 2, 3, 4, 5, 6, 7]
+console.log(levelOrderByLevels(tree)); // [[1], [2, 3], [4, 5, 6, 7]]
+```
+
+### 순회 방법 성능 비교
+
+```javascript
+function compareTraversalMethods() {
+    // 큰 트리 생성
+    function createLargeTree(depth, value = 1) {
+        if (depth === 0) return null;
+        
+        const node = new TreeNode(value);
+        node.left = createLargeTree(depth - 1, value * 2);
+        node.right = createLargeTree(depth - 1, value * 2 + 1);
+        return node;
+    }
+    
+    const largeTree = createLargeTree(15); // 2^15 - 1 = 32767개 노드
+    
+    const methods = {
+        '전위(재귀)': () => preorderTraversal(largeTree),
+        '전위(반복)': () => preorderIterative(largeTree),
+        '중위(재귀)': () => inorderTraversal(largeTree),
+        '중위(반복)': () => inorderIterative(largeTree),
+        '레벨순회': () => levelOrderTraversal(largeTree)
+    };
+    
+    Object.entries(methods).forEach(([name, method]) => {
+        const start = performance.now();
+        const result = method();
+        const end = performance.now();
+        
+        console.log(`${name}: ${(end - start).toFixed(2)}ms (노드 ${result.length}개)`);
+    });
+}
+```
+
+> 일반적으로 반복문 버전이 재귀 버전보다 약간 빠르고 스택 오버플로우 위험이 없습니다
+
+## 이진 검색 트리 (BST)
+
+왼쪽 자식은 부모보다 작고, 오른쪽 자식은 부모보다 큰 트리입니다.
+
+### BST 구현
+
+```javascript
+class BinarySearchTree {
+    constructor() {
+        this.root = null;
+    }
+    
+    insert(val) {
+        const newNode = new TreeNode(val);
+        
+        if (!this.root) {
+            this.root = newNode;
+            return this;
+        }
+        
+        let current = this.root;
+        while (true) {
+            if (val === current.val) return undefined; // 중복 값
+            
+            if (val < current.val) {
+                if (!current.left) {
+                    current.left = newNode;
+                    return this;
+                }
+                current = current.left;
+            } else {
+                if (!current.right) {
+                    current.right = newNode;
+                    return this;
+                }
+                current = current.right;
+            }
+        }
+    }
+    
+    search(val) {
+        let current = this.root;
+        
+        while (current) {
+            if (val === current.val) return true;
+            if (val < current.val) {
+                current = current.left;
+            } else {
+                current = current.right;
+            }
+        }
+        
+        return false;
+    }
+    
+    delete(val) {
+        this.root = this.deleteNode(this.root, val);
+    }
+    
+    deleteNode(node, val) {
+        if (!node) return null;
+        
+        if (val < node.val) {
+            node.left = this.deleteNode(node.left, val);
+        } else if (val > node.val) {
+            node.right = this.deleteNode(node.right, val);
+        } else {
+            // 삭제할 노드 발견
+            if (!node.left) return node.right;
+            if (!node.right) return node.left;
+            
+            // 두 자식이 모두 있는 경우
+            const minRight = this.findMin(node.right);
+            node.val = minRight.val;
+            node.right = this.deleteNode(node.right, minRight.val);
+        }
+        
+        return node;
+    }
+    
+    findMin(node = this.root) {
+        while (node.left) {
+            node = node.left;
+        }
+        return node;
+    }
+    
+    findMax(node = this.root) {
+        while (node.right) {
+            node = node.right;
+        }
+        return node;
+    }
+}
+
+// 사용 예시
+const bst = new BinarySearchTree();
+[15, 10, 20, 8, 12, 25].forEach(val => bst.insert(val));
+
+console.log(bst.search(12)); // true
+console.log(bst.search(7));  // false
+```
+
+### BST vs 배열 성능 비교
+
+```javascript
+function compareBSTvsArray() {
+    const size = 10000;
+    const values = Array.from({length: size}, () => Math.floor(Math.random() * size * 10));
+    
+    // BST 구성
+    const bst = new BinarySearchTree();
+    let start = performance.now();
+    values.forEach(val => bst.insert(val));
+    let end = performance.now();
+    const bstInsertTime = end - start;
+    
+    // 배열 구성
+    const arr = [];
+    start = performance.now();
+    values.forEach(val => {
+        if (!arr.includes(val)) arr.push(val);
+    });
+    end = performance.now();
+    const arrayInsertTime = end - start;
+    
+    // 정렬된 배열 구성
+    const sortedArr = [...new Set(values)].sort((a, b) => a - b);
+    
+    // 검색 성능 비교
+    const searchValues = Array.from({length: 1000}, () => Math.floor(Math.random() * size * 10));
+    
+    // BST 검색
+    start = performance.now();
+    searchValues.forEach(val => bst.search(val));
+    end = performance.now();
+    const bstSearchTime = end - start;
+    
+    // 배열 검색 (includes)
+    start = performance.now();
+    searchValues.forEach(val => arr.includes(val));
+    end = performance.now();
+    const arraySearchTime = end - start;
+    
+    // 이진 탐색
+    function binarySearch(arr, target) {
+        let left = 0, right = arr.length - 1;
+        while (left <= right) {
+            const mid = Math.floor((left + right) / 2);
+            if (arr[mid] === target) return true;
+            if (arr[mid] < target) left = mid + 1;
+            else right = mid - 1;
+        }
+        return false;
+    }
+    
+    start = performance.now();
+    searchValues.forEach(val => binarySearch(sortedArr, val));
+    end = performance.now();
+    const binarySearchTime = end - start;
+    
+    console.log(`=== 삽입 성능 ===`);
+    console.log(`BST: ${bstInsertTime.toFixed(2)}ms`);
+    console.log(`배열: ${arrayInsertTime.toFixed(2)}ms`);
+    
+    console.log(`\n=== 검색 성능 ===`);
+    console.log(`BST: ${bstSearchTime.toFixed(2)}ms`);
+    console.log(`배열 includes: ${arraySearchTime.toFixed(2)}ms`);
+    console.log(`이진 탐색: ${binarySearchTime.toFixed(2)}ms`);
+}
+```
+
+> BST는 평균적으로 O(log n) 성능을 제공하지만, 불균형할 때는 O(n)이 될 수 있습니다
+
+## 균형 이진 트리
+
+### AVL 트리 (간단한 버전)
+
+```javascript
+class AVLNode extends TreeNode {
+    constructor(val) {
+        super(val);
+        this.height = 1;
+    }
+}
+
+class AVLTree {
+    constructor() {
+        this.root = null;
+    }
+    
+    getHeight(node) {
+        return node ? node.height : 0;
+    }
+    
+    getBalance(node) {
+        return node ? this.getHeight(node.left) - this.getHeight(node.right) : 0;
+    }
+    
+    updateHeight(node) {
+        if (node) {
+            node.height = Math.max(this.getHeight(node.left), this.getHeight(node.right)) + 1;
+        }
+    }
+    
+    rotateRight(y) {
+        const x = y.left;
+        const T2 = x.right;
+        
+        x.right = y;
+        y.left = T2;
+        
+        this.updateHeight(y);
+        this.updateHeight(x);
+        
+        return x;
+    }
+    
+    rotateLeft(x) {
+        const y = x.right;
+        const T2 = y.left;
+        
+        y.left = x;
+        x.right = T2;
+        
+        this.updateHeight(x);
+        this.updateHeight(y);
+        
+        return y;
+    }
+    
+    insert(val) {
+        this.root = this.insertNode(this.root, val);
+    }
+    
+    insertNode(node, val) {
+        // 1. 일반적인 BST 삽입
+        if (!node) return new AVLNode(val);
+        
+        if (val < node.val) {
+            node.left = this.insertNode(node.left, val);
+        } else if (val > node.val) {
+            node.right = this.insertNode(node.right, val);
+        } else {
+            return node; // 중복 값
+        }
+        
+        // 2. 높이 업데이트
+        this.updateHeight(node);
+        
+        // 3. 균형 인수 계산
+        const balance = this.getBalance(node);
+        
+        // 4. 불균형 시 회전
+        // Left Left Case
+        if (balance > 1 && val < node.left.val) {
+            return this.rotateRight(node);
+        }
+        
+        // Right Right Case
+        if (balance < -1 && val > node.right.val) {
+            return this.rotateLeft(node);
+        }
+        
+        // Left Right Case
+        if (balance > 1 && val > node.left.val) {
+            node.left = this.rotateLeft(node.left);
+            return this.rotateRight(node);
+        }
+        
+        // Right Left Case
+        if (balance < -1 && val < node.right.val) {
+            node.right = this.rotateRight(node.right);
+            return this.rotateLeft(node);
+        }
+        
+        return node;
+    }
+}
+
+// AVL vs BST 성능 비교
+function compareAVLvsBST() {
+    const values = Array.from({length: 1000}, (_, i) => i); // 순차 데이터 (최악의 경우)
+    
+    // 일반 BST
+    const bst = new BinarySearchTree();
+    let start = performance.now();
+    values.forEach(val => bst.insert(val));
+    let end = performance.now();
+    const bstTime = end - start;
+    
+    // AVL 트리
+    const avl = new AVLTree();
+    start = performance.now();
+    values.forEach(val => avl.insert(val));
+    end = performance.now();
+    const avlTime = end - start;
+    
+    console.log(`BST 삽입 (순차 데이터): ${bstTime.toFixed(2)}ms`);
+    console.log(`AVL 삽입 (순차 데이터): ${avlTime.toFixed(2)}ms`);
+    
+    // 트리 높이 비교
+    function getTreeHeight(node) {
+        if (!node) return 0;
+        return Math.max(getTreeHeight(node.left), getTreeHeight(node.right)) + 1;
+    }
+    
+    console.log(`BST 높이: ${getTreeHeight(bst.root)}`);
+    console.log(`AVL 높이: ${getTreeHeight(avl.root)}`);
+}
+```
+
+> AVL 트리는 항상 균형을 유지하므로 최악의 경우에도 O(log n) 성능을 보장합니다
+
+## 트리 문제 해결
+
+### 트리의 깊이와 높이
+
+```javascript
+// 최대 깊이 (높이)
+function maxDepth(root) {
+    if (!root) return 0;
+    return Math.max(maxDepth(root.left), maxDepth(root.right)) + 1;
+}
+
+// 최소 깊이
+function minDepth(root) {
+    if (!root) return 0;
+    if (!root.left) return minDepth(root.right) + 1;
+    if (!root.right) return minDepth(root.left) + 1;
+    return Math.min(minDepth(root.left), minDepth(root.right)) + 1;
+}
+
+// 균형 트리 검사
+function isBalanced(root) {
+    function checkBalance(node) {
+        if (!node) return 0;
+        
+        const left = checkBalance(node.left);
+        if (left === -1) return -1;
+        
+        const right = checkBalance(node.right);
+        if (right === -1) return -1;
+        
+        if (Math.abs(left - right) > 1) return -1;
+        
+        return Math.max(left, right) + 1;
+    }
+    
+    return checkBalance(root) !== -1;
+}
+
+const tree = createSampleTree();
+console.log(`최대 깊이: ${maxDepth(tree)}`); // 3
+console.log(`최소 깊이: ${minDepth(tree)}`); // 3
+console.log(`균형 트리: ${isBalanced(tree)}`); // true
+```
+
+### 경로와 합
+
+```javascript
+// 루트에서 잎까지의 모든 경로
+function allPaths(root) {
+    const paths = [];
+    
+    function dfs(node, currentPath) {
+        if (!node) return;
+        
+        currentPath.push(node.val);
+        
+        if (!node.left && !node.right) {
+            paths.push([...currentPath]);
+        } else {
+            dfs(node.left, currentPath);
+            dfs(node.right, currentPath);
+        }
+        
+        currentPath.pop();
+    }
+    
+    dfs(root, []);
+    return paths;
+}
+
+// 특정 합을 가지는 경로 찾기
+function hasPathSum(root, targetSum) {
+    if (!root) return false;
+    
+    if (!root.left && !root.right) {
+        return root.val === targetSum;
+    }
+    
+    const remainingSum = targetSum - root.val;
+    return hasPathSum(root.left, remainingSum) || hasPathSum(root.right, remainingSum);
+}
+
+// 최대 경로 합
+function maxPathSum(root) {
+    let maxSum = -Infinity;
+    
+    function dfs(node) {
+        if (!node) return 0;
+        
+        const left = Math.max(0, dfs(node.left));
+        const right = Math.max(0, dfs(node.right));
+        
+        const currentMax = node.val + left + right;
+        maxSum = Math.max(maxSum, currentMax);
+        
+        return node.val + Math.max(left, right);
+    }
+    
+    dfs(root);
+    return maxSum;
+}
+
+console.log(allPaths(tree));
+console.log(hasPathSum(tree, 7)); // true (1->2->4)
+```
+
+### 트리 변환
+
+```javascript
+// 트리 뒤집기 (좌우 반전)
+function invertTree(root) {
+    if (!root) return null;
+    
+    [root.left, root.right] = [root.right, root.left];
+    
+    invertTree(root.left);
+    invertTree(root.right);
+    
+    return root;
+}
+
+// 트리를 연결 리스트로 평탄화
+function flattenToLinkedList(root) {
+    if (!root) return;
+    
+    flattenToLinkedList(root.left);
+    flattenToLinkedList(root.right);
+    
+    const tempRight = root.right;
+    root.right = root.left;
+    root.left = null;
+    
+    let current = root;
+    while (current.right) {
+        current = current.right;
+    }
+    current.right = tempRight;
+}
+
+// 배열에서 트리 구성
+function arrayToTree(arr) {
+    if (!arr.length) return null;
+    
+    const root = new TreeNode(arr[0]);
+    const queue = [root];
+    let i = 1;
+    
+    while (queue.length > 0 && i < arr.length) {
+        const node = queue.shift();
+        
+        if (i < arr.length && arr[i] !== null) {
+            node.left = new TreeNode(arr[i]);
+            queue.push(node.left);
+        }
+        i++;
+        
+        if (i < arr.length && arr[i] !== null) {
+            node.right = new TreeNode(arr[i]);
+            queue.push(node.right);
+        }
+        i++;
+    }
+    
+    return root;
+}
+
+const arrayTree = arrayToTree([1, 2, 3, 4, 5, null, 6]);
+console.log(levelOrderTraversal(arrayTree)); // [1, 2, 3, 4, 5, 6]
+```
+
+## 특수한 트리들
+
+### 트라이 (Trie) - 문자열 검색 트리
+
+```javascript
+class TrieNode {
+    constructor() {
+        this.children = {};
+        this.isEndOfWord = false;
+    }
+}
+
+class Trie {
+    constructor() {
+        this.root = new TrieNode();
+    }
+    
+    insert(word) {
+        let current = this.root;
+        
+        for (let char of word) {
+            if (!current.children[char]) {
+                current.children[char] = new TrieNode();
+            }
+            current = current.children[char];
+        }
+        
+        current.isEndOfWord = true;
+    }
+    
+    search(word) {
+        let current = this.root;
+        
+        for (let char of word) {
+            if (!current.children[char]) {
+                return false;
+            }
+            current = current.children[char];
+        }
+        
+        return current.isEndOfWord;
+    }
+    
+    startsWith(prefix) {
+        let current = this.root;
+        
+        for (let char of prefix) {
+            if (!current.children[char]) {
+                return false;
+            }
+            current = current.children[char];
+        }
+        
+        return true;
+    }
+    
+    getAllWords() {
+        const words = [];
+        
+        function dfs(node, currentWord) {
+            if (node.isEndOfWord) {
+                words.push(currentWord);
+            }
+            
+            for (let char in node.children) {
+                dfs(node.children[char], currentWord + char);
+            }
+        }
+        
+        dfs(this.root, '');
+        return words;
+    }
+}
+
+// 자동완성 기능
+function autoComplete(trie, prefix) {
+    let current = trie.root;
+    
+    // 접두사까지 이동
+    for (let char of prefix) {
+        if (!current.children[char]) {
+            return [];
+        }
+        current = current.children[char];
+    }
+    
+    // 접두사로 시작하는 모든 단어 찾기
+    const suggestions = [];
+    
+    function dfs(node, currentWord) {
+        if (node.isEndOfWord) {
+            suggestions.push(prefix + currentWord);
+        }
+        
+        for (let char in node.children) {
+            dfs(node.children[char], currentWord + char);
+        }
+    }
+    
+    dfs(current, '');
+    return suggestions;
+}
+
+// 사용 예시
+const trie = new Trie();
+const words = ['apple', 'app', 'application', 'apply', 'banana', 'band'];
+words.forEach(word => trie.insert(word));
+
+console.log(trie.search('app')); // true
+console.log(trie.startsWith('app')); // true
+console.log(autoComplete(trie, 'app')); // ['apple', 'app', 'application', 'apply']
+```
+
+### 세그먼트 트리 (구간 합 트리)
+
+```javascript
+class SegmentTree {
+    constructor(arr) {
+        this.n = arr.length;
+        this.tree = Array(4 * this.n).fill(0);
+        this.build(arr, 0, 0, this.n - 1);
+    }
+    
+    build(arr, node, start, end) {
+        if (start === end) {
+            this.tree[node] = arr[start];
+        } else {
+            const mid = Math.floor((start + end) / 2);
+            this.build(arr, 2 * node + 1, start, mid);
+            this.build(arr, 2 * node + 2, mid + 1, end);
+            this.tree[node] = this.tree[2 * node + 1] + this.tree[2 * node + 2];
+        }
+    }
+    
+    update(index, value) {
+        this.updateHelper(0, 0, this.n - 1, index, value);
+    }
+    
+    updateHelper(node, start, end, index, value) {
+        if (start === end) {
+            this.tree[node] = value;
+        } else {
+            const mid = Math.floor((start + end) / 2);
+            if (index <= mid) {
+                this.updateHelper(2 * node + 1, start, mid, index, value);
+            } else {
+                this.updateHelper(2 * node + 2, mid + 1, end, index, value);
+            }
+            this.tree[node] = this.tree[2 * node + 1] + this.tree[2 * node + 2];
+        }
+    }
+    
+    query(left, right) {
+        return this.queryHelper(0, 0, this.n - 1, left, right);
+    }
+    
+    queryHelper(node, start, end, left, right) {
+        if (right < start || end < left) {
+            return 0; // 범위 밖
+        }
+        
+        if (left <= start && end <= right) {
+            return this.tree[node]; // 완전히 포함
+        }
+        
+        const mid = Math.floor((start + end) / 2);
+        const leftSum = this.queryHelper(2 * node + 1, start, mid, left, right);
+        const rightSum = this.queryHelper(2 * node + 2, mid + 1, end, left, right);
+        
+        return leftSum + rightSum;
+    }
+}
+
+// 사용 예시
+const arr = [1, 3, 5, 7, 9, 11];
+const segTree = new SegmentTree(arr);
+
+console.log(segTree.query(1, 3)); // 3 + 5 + 7 = 15
+segTree.update(1, 10);
+console.log(segTree.query(1, 3)); // 10 + 5 + 7 = 22
+```
+
+## 실제 문제 응용
+
+### 가장 가까운 공통 조상
+
+```javascript
+function lowestCommonAncestor(root, p, q) {
+    if (!root || root === p || root === q) {
+        return root;
+    }
+    
+    const left = lowestCommonAncestor(root.left, p, q);
+    const right = lowestCommonAncestor(root.right, p, q);
+    
+    if (left && right) return root;
+    return left || right;
+}
+
+// BST에서의 LCA (더 효율적)
+function lowestCommonAncestorBST(root, p, q) {
+    while (root) {
+        if (p.val < root.val && q.val < root.val) {
+            root = root.left;
+        } else if (p.val > root.val && q.val > root.val) {
+            root = root.right;
+        } else {
+            return root;
+        }
+    }
+    return null;
+}
+```
+
+### 직렬화와 역직렬화
+
+```javascript
+function serialize(root) {
+    const result = [];
+    
+    function preorder(node) {
+        if (!node) {
+            result.push('null');
+            return;
+        }
+        
+        result.push(node.val.toString());
+        preorder(node.left);
+        preorder(node.right);
+    }
+    
+    preorder(root);
+    return result.join(',');
+}
+
+function deserialize(data) {
+    const values = data.split(',');
+    let index = 0;
+    
+    function buildTree() {
+        if (values[index] === 'null') {
+            index++;
+            return null;
+        }
+        
+        const node = new TreeNode(parseInt(values[index]));
+        index++;
+        
+        node.left = buildTree();
+        node.right = buildTree();
+        
+        return node;
+    }
+    
+    return buildTree();
+}
+
+// 사용 예시
+const originalTree = createSampleTree();
+const serialized = serialize(originalTree);
+console.log(serialized); // "1,2,4,null,null,5,null,null,3,6,null,null,7,null,null"
+
+const deserializedTree = deserialize(serialized);
+console.log(levelOrderTraversal(deserializedTree)); // [1, 2, 3, 4, 5, 6, 7]
+```
+
+## 트리 알고리즘 선택 가이드
+
+```javascript
+function chooseTreeAlgorithm() {
+    console.log("트리 알고리즘 선택 가이드:");
+    
+    console.log("\n🔍 검색이 주목적:");
+    console.log("- 균형 BST (AVL, Red-Black)");
+    console.log("- 해시 테이블과 비교 고려");
+    
+    console.log("\n📝 문자열 검색:");
+    console.log("- 트라이 (Trie)");
+    console.log("- 자동완성, 사전 기능");
+    
+    console.log("\n📊 구간 쿼리:");
+    console.log("- 세그먼트 트리");
+    console.log("- 펜윅 트리 (Binary Indexed Tree)");
+    
+    console.log("\n🌳 일반적인 계층 구조:");
+    console.log("- 이진 트리");
+    console.log("- N-ary 트리");
+    
+    console.log("\n⚡ 성능 특성:");
+    console.log("- BST: 평균 O(log n), 최악 O(n)");
+    console.log("- 균형 트리: 항상 O(log n)");
+    console.log("- 트라이: O(m) (m은 문자열 길이)");
+}
+```
+
+트리는 계층적 데이터를 효율적으로 처리할 수 있는 강력한 자료구조입니다. 문제의 특성에 맞는 트리 구조와 알고리즘을 선택하는 것이 중요합니다.

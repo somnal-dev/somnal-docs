@@ -1,0 +1,433 @@
+# 이진탐색(Binary Search)
+
+## 이진탐색이란?
+
+이진탐색은 정렬된 배열에서 특정 값을 찾는 매우 빠른 방법입니다.
+
+마치 사전에서 단어를 찾는 것과 같습니다:
+1. 사전 가운데를 펼칩니다
+2. 찾는 단어가 현재 페이지보다 앞에 있으면 앞쪽 절반을 봅니다
+3. 뒤에 있으면 뒤쪽 절반을 봅니다
+4. 찾을 때까지 반복합니다
+
+```
+정렬된 배열: [1, 3, 5, 7, 9, 11, 13, 15]
+찾는 값: 7
+
+1단계: 중간(7과 9 사이) -> 7 < 9이므로 왼쪽 절반
+2단계: [1, 3, 5, 7] 중간(3과 5 사이) -> 7 > 5이므로 오른쪽 절반  
+3단계: [5, 7] 중간은 7 -> 찾았습니다!
+```
+
+## 기본 구현
+
+### 반복문으로 구현
+
+```javascript
+function binarySearch(arr, target) {
+    let left = 0;
+    let right = arr.length - 1;
+    
+    while (left <= right) {
+        const mid = Math.floor((left + right) / 2);
+        
+        if (arr[mid] === target) {
+            return mid; // 찾은 인덱스 반환
+        } else if (arr[mid] < target) {
+            left = mid + 1; // 오른쪽 절반 탐색
+        } else {
+            right = mid - 1; // 왼쪽 절반 탐색
+        }
+    }
+    
+    return -1; // 못 찾음
+}
+```
+
+### 재귀로 구현
+
+```javascript
+function binarySearchRecursive(arr, target, left = 0, right = arr.length - 1) {
+    if (left > right) {
+        return -1; // 못 찾음
+    }
+    
+    const mid = Math.floor((left + right) / 2);
+    
+    if (arr[mid] === target) {
+        return mid;
+    } else if (arr[mid] < target) {
+        return binarySearchRecursive(arr, target, mid + 1, right);
+    } else {
+        return binarySearchRecursive(arr, target, left, mid - 1);
+    }
+}
+```
+
+### 성능 비교
+
+```javascript
+function compareSearchMethods() {
+    // 큰 정렬된 배열 생성
+    const size = 1000000;
+    const arr = Array.from({length: size}, (_, i) => i * 2);
+    const target = 999998;
+    const iterations = 10000;
+    
+    // 선형 탐색
+    function linearSearch(arr, target) {
+        for (let i = 0; i < arr.length; i++) {
+            if (arr[i] === target) return i;
+        }
+        return -1;
+    }
+    
+    // 선형 탐색 성능 테스트
+    let start = performance.now();
+    for (let i = 0; i < iterations; i++) {
+        linearSearch(arr, target);
+    }
+    let end = performance.now();
+    const linearTime = end - start;
+    
+    // 이진 탐색 성능 테스트
+    start = performance.now();
+    for (let i = 0; i < iterations; i++) {
+        binarySearch(arr, target);
+    }
+    end = performance.now();
+    const binaryTime = end - start;
+    
+    // JavaScript 내장 indexOf 성능 테스트
+    start = performance.now();
+    for (let i = 0; i < iterations; i++) {
+        arr.indexOf(target);
+    }
+    end = performance.now();
+    const indexOfTime = end - start;
+    
+    console.log(`선형 탐색: ${linearTime.toFixed(2)}ms`);
+    console.log(`이진 탐색: ${binaryTime.toFixed(2)}ms`);
+    console.log(`indexOf: ${indexOfTime.toFixed(2)}ms`);
+    
+    console.log(`이진 탐색이 선형 탐색보다 ${(linearTime / binaryTime).toFixed(1)}배 빠름`);
+}
+```
+
+> 이진탐색이 선형탐색보다 수백 배 빠릅니다. 데이터가 클수록 차이가 더 큽니다.
+
+## 변형 문제들
+
+### 첫 번째 위치 찾기
+
+같은 값이 여러 개 있을 때 첫 번째 위치를 찾습니다.
+
+```javascript
+function findFirst(arr, target) {
+    let left = 0;
+    let right = arr.length - 1;
+    let result = -1;
+    
+    while (left <= right) {
+        const mid = Math.floor((left + right) / 2);
+        
+        if (arr[mid] === target) {
+            result = mid;
+            right = mid - 1; // 더 왼쪽에 있는지 계속 찾기
+        } else if (arr[mid] < target) {
+            left = mid + 1;
+        } else {
+            right = mid - 1;
+        }
+    }
+    
+    return result;
+}
+
+const arr = [1, 2, 2, 2, 3, 4, 5];
+console.log(findFirst(arr, 2)); // 1 (첫 번째 2의 위치)
+```
+
+### 마지막 위치 찾기
+
+```javascript
+function findLast(arr, target) {
+    let left = 0;
+    let right = arr.length - 1;
+    let result = -1;
+    
+    while (left <= right) {
+        const mid = Math.floor((left + right) / 2);
+        
+        if (arr[mid] === target) {
+            result = mid;
+            left = mid + 1; // 더 오른쪽에 있는지 계속 찾기
+        } else if (arr[mid] < target) {
+            left = mid + 1;
+        } else {
+            right = mid - 1;
+        }
+    }
+    
+    return result;
+}
+
+console.log(findLast(arr, 2)); // 3 (마지막 2의 위치)
+```
+
+### 삽입 위치 찾기
+
+```javascript
+function searchInsertPosition(arr, target) {
+    let left = 0;
+    let right = arr.length - 1;
+    
+    while (left <= right) {
+        const mid = Math.floor((left + right) / 2);
+        
+        if (arr[mid] === target) {
+            return mid;
+        } else if (arr[mid] < target) {
+            left = mid + 1;
+        } else {
+            right = mid - 1;
+        }
+    }
+    
+    return left; // 삽입해야 할 위치
+}
+
+const sortedArr = [1, 3, 5, 6];
+console.log(searchInsertPosition(sortedArr, 5)); // 2
+console.log(searchInsertPosition(sortedArr, 2)); // 1
+console.log(searchInsertPosition(sortedArr, 7)); // 4
+```
+
+## 성능 비교 (다양한 상황)
+
+```javascript
+function comprehensivePerformanceTest() {
+    const sizes = [1000, 10000, 100000, 1000000];
+    
+    sizes.forEach(size => {
+        console.log(`\n=== 배열 크기: ${size.toLocaleString()} ===`);
+        
+        const arr = Array.from({length: size}, (_, i) => i);
+        const target = size - 1; // 마지막 원소 찾기 (최악의 경우)
+        
+        // 선형 탐색
+        let start = performance.now();
+        for (let i = 0; i < 1000; i++) {
+            linearSearch(arr, target);
+        }
+        let end = performance.now();
+        const linearTime = end - start;
+        
+        // 이진 탐색
+        start = performance.now();
+        for (let i = 0; i < 1000; i++) {
+            binarySearch(arr, target);
+        }
+        end = performance.now();
+        const binaryTime = end - start;
+        
+        console.log(`선형 탐색: ${linearTime.toFixed(2)}ms`);
+        console.log(`이진 탐색: ${binaryTime.toFixed(2)}ms`);
+        console.log(`속도 차이: ${(linearTime / binaryTime).toFixed(1)}배`);
+    });
+}
+
+function linearSearch(arr, target) {
+    for (let i = 0; i < arr.length; i++) {
+        if (arr[i] === target) return i;
+    }
+    return -1;
+}
+```
+
+> 배열 크기가 클수록 이진탐색의 성능 우위가 더욱 명확해집니다
+
+## 실제 문제 예시
+
+### 제곱근 구하기
+
+```javascript
+function mySqrt(x) {
+    if (x < 2) return x;
+    
+    let left = 1;
+    let right = Math.floor(x / 2);
+    
+    while (left <= right) {
+        const mid = Math.floor((left + right) / 2);
+        const square = mid * mid;
+        
+        if (square === x) {
+            return mid;
+        } else if (square < x) {
+            left = mid + 1;
+        } else {
+            right = mid - 1;
+        }
+    }
+    
+    return right; // 가장 가까운 정수
+}
+
+console.log(mySqrt(4)); // 2
+console.log(mySqrt(8)); // 2 (2.xx의 정수 부분)
+console.log(mySqrt(16)); // 4
+```
+
+### 회전된 정렬 배열에서 탐색
+
+```javascript
+function searchInRotatedArray(nums, target) {
+    let left = 0;
+    let right = nums.length - 1;
+    
+    while (left <= right) {
+        const mid = Math.floor((left + right) / 2);
+        
+        if (nums[mid] === target) {
+            return mid;
+        }
+        
+        // 왼쪽 부분이 정렬되어 있는 경우
+        if (nums[left] <= nums[mid]) {
+            if (nums[left] <= target && target < nums[mid]) {
+                right = mid - 1;
+            } else {
+                left = mid + 1;
+            }
+        }
+        // 오른쪽 부분이 정렬되어 있는 경우
+        else {
+            if (nums[mid] < target && target <= nums[right]) {
+                left = mid + 1;
+            } else {
+                right = mid - 1;
+            }
+        }
+    }
+    
+    return -1;
+}
+
+const rotated = [4, 5, 6, 7, 0, 1, 2];
+console.log(searchInRotatedArray(rotated, 0)); // 4
+console.log(searchInRotatedArray(rotated, 3)); // -1
+```
+
+### 피크 원소 찾기
+
+```javascript
+function findPeakElement(nums) {
+    let left = 0;
+    let right = nums.length - 1;
+    
+    while (left < right) {
+        const mid = Math.floor((left + right) / 2);
+        
+        if (nums[mid] > nums[mid + 1]) {
+            right = mid; // 피크가 왼쪽에 있음
+        } else {
+            left = mid + 1; // 피크가 오른쪽에 있음
+        }
+    }
+    
+    return left;
+}
+
+console.log(findPeakElement([1, 2, 3, 1])); // 2 (값 3의 인덱스)
+console.log(findPeakElement([1, 2, 1, 3, 5, 6, 4])); // 1 또는 5
+```
+
+## 이진탐색이 적용되는 다른 분야
+
+### 범위에서 답 찾기
+
+```javascript
+// 특정 조건을 만족하는 최소값 찾기
+function findMinimumCapacity(weights, days) {
+    let left = Math.max(...weights); // 최소 용량
+    let right = weights.reduce((sum, w) => sum + w, 0); // 최대 용량
+    
+    function canShipInDays(capacity) {
+        let currentWeight = 0;
+        let daysNeeded = 1;
+        
+        for (let weight of weights) {
+            if (currentWeight + weight > capacity) {
+                daysNeeded++;
+                currentWeight = weight;
+            } else {
+                currentWeight += weight;
+            }
+        }
+        
+        return daysNeeded <= days;
+    }
+    
+    while (left < right) {
+        const mid = Math.floor((left + right) / 2);
+        
+        if (canShipInDays(mid)) {
+            right = mid;
+        } else {
+            left = mid + 1;
+        }
+    }
+    
+    return left;
+}
+
+const weights = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+const days = 5;
+console.log(findMinimumCapacity(weights, days)); // 15
+```
+
+## 주의사항
+
+### 오버플로우 방지
+
+```javascript
+// 잘못된 방법 (큰 수에서 오버플로우 가능)
+const mid = Math.floor((left + right) / 2);
+
+// 올바른 방법
+const mid = left + Math.floor((right - left) / 2);
+```
+
+### 무한 루프 방지
+
+```javascript
+// 잘못된 조건 (무한 루프 가능)
+while (left < right) {
+    const mid = Math.floor((left + right) / 2);
+    if (condition) {
+        left = mid; // mid가 left와 같을 수 있음
+    } else {
+        right = mid - 1;
+    }
+}
+
+// 올바른 방법
+while (left < right) {
+    const mid = Math.floor((left + right) / 2);
+    if (condition) {
+        left = mid + 1; // 항상 범위가 줄어듦
+    } else {
+        right = mid;
+    }
+}
+```
+
+## 언제 사용하나요?
+
+- 정렬된 배열에서 특정 값을 찾을 때
+- 조건을 만족하는 최소/최대값을 찾을 때
+- 범위가 정해진 문제에서 답을 찾을 때
+- O(log n) 시간 복잡도가 필요할 때
+
+이진탐색은 정렬된 데이터에서만 사용할 수 있지만, 매우 빠른 성능을 제공하므로 대용량 데이터 처리에 필수적인 알고리즘입니다.

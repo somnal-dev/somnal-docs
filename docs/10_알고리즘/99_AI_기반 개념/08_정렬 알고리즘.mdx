@@ -1,0 +1,642 @@
+# 정렬 알고리즘
+
+## 정렬이란?
+
+정렬은 데이터를 순서대로 나열하는 것입니다.
+
+마치 책장에서 책을 가나다순으로 정리하거나, 키 순서대로 줄을 세우는 것과 같습니다.
+- 오름차순: 작은 것부터 큰 것 순서
+- 내림차순: 큰 것부터 작은 것 순서
+
+```
+정렬 전: [64, 34, 25, 12, 22, 11, 90]
+정렬 후: [11, 12, 22, 25, 34, 64, 90]
+```
+
+## 간단한 정렬들
+
+### 버블 정렬 (Bubble Sort)
+
+가장 이해하기 쉬운 정렬입니다. 인접한 두 원소를 비교해서 바꿔가며 정렬합니다.
+
+```javascript
+function bubbleSort(arr) {
+    const n = arr.length;
+    const result = [...arr];
+    
+    for (let i = 0; i < n - 1; i++) {
+        for (let j = 0; j < n - i - 1; j++) {
+            if (result[j] > result[j + 1]) {
+                // 두 원소 교환
+                [result[j], result[j + 1]] = [result[j + 1], result[j]];
+            }
+        }
+    }
+    
+    return result;
+}
+
+// 최적화 버전 (일찍 종료)
+function bubbleSortOptimized(arr) {
+    const result = [...arr];
+    const n = result.length;
+    
+    for (let i = 0; i < n - 1; i++) {
+        let swapped = false;
+        
+        for (let j = 0; j < n - i - 1; j++) {
+            if (result[j] > result[j + 1]) {
+                [result[j], result[j + 1]] = [result[j + 1], result[j]];
+                swapped = true;
+            }
+        }
+        
+        if (!swapped) break; // 더 이상 교환이 없으면 정렬 완료
+    }
+    
+    return result;
+}
+
+console.log(bubbleSort([64, 34, 25, 12, 22, 11, 90]));
+// [11, 12, 22, 25, 34, 64, 90]
+```
+
+### 선택 정렬 (Selection Sort)
+
+매번 가장 작은 원소를 찾아서 앞으로 보내는 방법입니다.
+
+```javascript
+function selectionSort(arr) {
+    const result = [...arr];
+    const n = result.length;
+    
+    for (let i = 0; i < n - 1; i++) {
+        let minIndex = i;
+        
+        // 최소값 찾기
+        for (let j = i + 1; j < n; j++) {
+            if (result[j] < result[minIndex]) {
+                minIndex = j;
+            }
+        }
+        
+        // 최소값을 현재 위치와 교환
+        if (minIndex !== i) {
+            [result[i], result[minIndex]] = [result[minIndex], result[i]];
+        }
+    }
+    
+    return result;
+}
+
+console.log(selectionSort([64, 34, 25, 12, 22, 11, 90]));
+```
+
+### 삽입 정렬 (Insertion Sort)
+
+카드를 정렬할 때처럼, 하나씩 적절한 위치에 삽입하는 방법입니다.
+
+```javascript
+function insertionSort(arr) {
+    const result = [...arr];
+    
+    for (let i = 1; i < result.length; i++) {
+        const key = result[i];
+        let j = i - 1;
+        
+        // key보다 큰 원소들을 오른쪽으로 이동
+        while (j >= 0 && result[j] > key) {
+            result[j + 1] = result[j];
+            j--;
+        }
+        
+        result[j + 1] = key;
+    }
+    
+    return result;
+}
+
+console.log(insertionSort([64, 34, 25, 12, 22, 11, 90]));
+```
+
+## 효율적인 정렬들
+
+### 병합 정렬 (Merge Sort)
+
+분할 정복 방식으로 배열을 반으로 나누어 정렬한 후 합치는 방법입니다.
+
+```javascript
+function mergeSort(arr) {
+    if (arr.length <= 1) return arr;
+    
+    const mid = Math.floor(arr.length / 2);
+    const left = mergeSort(arr.slice(0, mid));
+    const right = mergeSort(arr.slice(mid));
+    
+    return merge(left, right);
+}
+
+function merge(left, right) {
+    const result = [];
+    let i = 0, j = 0;
+    
+    while (i < left.length && j < right.length) {
+        if (left[i] <= right[j]) {
+            result.push(left[i]);
+            i++;
+        } else {
+            result.push(right[j]);
+            j++;
+        }
+    }
+    
+    // 남은 원소들 추가
+    return result.concat(left.slice(i)).concat(right.slice(j));
+}
+
+console.log(mergeSort([64, 34, 25, 12, 22, 11, 90]));
+```
+
+### 퀵 정렬 (Quick Sort)
+
+피벗을 기준으로 작은 것은 왼쪽, 큰 것은 오른쪽으로 나누어 정렬하는 방법입니다.
+
+```javascript
+function quickSort(arr) {
+    if (arr.length <= 1) return arr;
+    
+    const pivot = arr[Math.floor(arr.length / 2)];
+    const left = [];
+    const right = [];
+    const equal = [];
+    
+    for (let element of arr) {
+        if (element < pivot) {
+            left.push(element);
+        } else if (element > pivot) {
+            right.push(element);
+        } else {
+            equal.push(element);
+        }
+    }
+    
+    return [...quickSort(left), ...equal, ...quickSort(right)];
+}
+
+// 제자리 정렬 버전 (메모리 효율적)
+function quickSortInPlace(arr, low = 0, high = arr.length - 1) {
+    if (low < high) {
+        const pivotIndex = partition(arr, low, high);
+        quickSortInPlace(arr, low, pivotIndex - 1);
+        quickSortInPlace(arr, pivotIndex + 1, high);
+    }
+    return arr;
+}
+
+function partition(arr, low, high) {
+    const pivot = arr[high];
+    let i = low - 1;
+    
+    for (let j = low; j < high; j++) {
+        if (arr[j] <= pivot) {
+            i++;
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+    }
+    
+    [arr[i + 1], arr[high]] = [arr[high], arr[i + 1]];
+    return i + 1;
+}
+
+console.log(quickSort([64, 34, 25, 12, 22, 11, 90]));
+```
+
+### 힙 정렬 (Heap Sort)
+
+힙 자료구조를 이용한 정렬입니다.
+
+```javascript
+function heapSort(arr) {
+    const result = [...arr];
+    const n = result.length;
+    
+    // 힙 구성 (최대 힙)
+    for (let i = Math.floor(n / 2) - 1; i >= 0; i--) {
+        heapify(result, n, i);
+    }
+    
+    // 하나씩 추출하여 정렬
+    for (let i = n - 1; i > 0; i--) {
+        [result[0], result[i]] = [result[i], result[0]];
+        heapify(result, i, 0);
+    }
+    
+    return result;
+}
+
+function heapify(arr, n, i) {
+    let largest = i;
+    const left = 2 * i + 1;
+    const right = 2 * i + 2;
+    
+    if (left < n && arr[left] > arr[largest]) {
+        largest = left;
+    }
+    
+    if (right < n && arr[right] > arr[largest]) {
+        largest = right;
+    }
+    
+    if (largest !== i) {
+        [arr[i], arr[largest]] = [arr[largest], arr[i]];
+        heapify(arr, n, largest);
+    }
+}
+
+console.log(heapSort([64, 34, 25, 12, 22, 11, 90]));
+```
+
+## 성능 비교
+
+```javascript
+function compareAllSortingAlgorithms() {
+    const sizes = [100, 1000, 5000];
+    
+    const algorithms = {
+        'JavaScript 내장': (arr) => [...arr].sort((a, b) => a - b),
+        '버블 정렬': bubbleSort,
+        '선택 정렬': selectionSort,
+        '삽입 정렬': insertionSort,
+        '병합 정렬': mergeSort,
+        '퀵 정렬': quickSort,
+        '힙 정렬': heapSort
+    };
+    
+    sizes.forEach(size => {
+        console.log(`\n=== 배열 크기: ${size} ===`);
+        
+        // 랜덤 배열 생성
+        const randomArray = Array.from({length: size}, () => 
+            Math.floor(Math.random() * size)
+        );
+        
+        Object.entries(algorithms).forEach(([name, sortFunc]) => {
+            const testArray = [...randomArray];
+            
+            const start = performance.now();
+            sortFunc(testArray);
+            const end = performance.now();
+            
+            console.log(`${name}: ${(end - start).toFixed(2)}ms`);
+        });
+    });
+    
+    console.log(`\n시간 복잡도 요약:`);
+    console.log(`버블 정렬: O(n²)`);
+    console.log(`선택 정렬: O(n²)`);
+    console.log(`삽입 정렬: O(n²)`);
+    console.log(`병합 정렬: O(n log n)`);
+    console.log(`퀵 정렬: 평균 O(n log n), 최악 O(n²)`);
+    console.log(`힙 정렬: O(n log n)`);
+}
+```
+
+> JavaScript 내장 정렬이 가장 빠르고, O(n log n) 정렬들이 O(n²) 정렬들보다 빠릅니다
+
+### 다양한 상황에서의 성능
+
+```javascript
+function compareInDifferentScenarios() {
+    const size = 1000;
+    
+    // 1. 이미 정렬된 배열
+    const sortedArray = Array.from({length: size}, (_, i) => i);
+    
+    // 2. 역순 정렬된 배열
+    const reversedArray = Array.from({length: size}, (_, i) => size - i);
+    
+    // 3. 거의 정렬된 배열
+    const nearlySortedArray = Array.from({length: size}, (_, i) => i);
+    for (let i = 0; i < size / 10; i++) {
+        const idx1 = Math.floor(Math.random() * size);
+        const idx2 = Math.floor(Math.random() * size);
+        [nearlySortedArray[idx1], nearlySortedArray[idx2]] = 
+        [nearlySortedArray[idx2], nearlySortedArray[idx1]];
+    }
+    
+    // 4. 중복이 많은 배열
+    const duplicateArray = Array.from({length: size}, () => 
+        Math.floor(Math.random() * 10)
+    );
+    
+    const scenarios = {
+        '정렬됨': sortedArray,
+        '역순': reversedArray,
+        '거의 정렬됨': nearlySortedArray,
+        '중복 많음': duplicateArray
+    };
+    
+    const algorithms = {
+        '삽입 정렬': insertionSort,
+        '병합 정렬': mergeSort,
+        '퀵 정렬': quickSort
+    };
+    
+    Object.entries(scenarios).forEach(([scenarioName, array]) => {
+        console.log(`\n=== ${scenarioName} 배열 ===`);
+        
+        Object.entries(algorithms).forEach(([algName, sortFunc]) => {
+            const testArray = [...array];
+            
+            const start = performance.now();
+            sortFunc(testArray);
+            const end = performance.now();
+            
+            console.log(`${algName}: ${(end - start).toFixed(2)}ms`);
+        });
+    });
+}
+```
+
+> 삽입 정렬은 거의 정렬된 배열에서 매우 빠르고, 퀵 정렬은 역순 배열에서 느릴 수 있습니다
+
+## 특수한 정렬들
+
+### 계수 정렬 (Counting Sort)
+
+범위가 제한된 정수 배열을 매우 빠르게 정렬할 수 있습니다.
+
+```javascript
+function countingSort(arr, maxValue = Math.max(...arr)) {
+    const count = Array(maxValue + 1).fill(0);
+    const result = Array(arr.length);
+    
+    // 각 값의 개수 세기
+    for (let num of arr) {
+        count[num]++;
+    }
+    
+    // 누적 개수 계산
+    for (let i = 1; i <= maxValue; i++) {
+        count[i] += count[i - 1];
+    }
+    
+    // 결과 배열 구성 (안정 정렬을 위해 뒤에서부터)
+    for (let i = arr.length - 1; i >= 0; i--) {
+        result[count[arr[i]] - 1] = arr[i];
+        count[arr[i]]--;
+    }
+    
+    return result;
+}
+
+// 범위가 작을 때 매우 빠름
+const smallRangeArray = [4, 2, 2, 8, 3, 3, 1];
+console.log(countingSort(smallRangeArray)); // [1, 2, 2, 3, 3, 4, 8]
+```
+
+### 기수 정렬 (Radix Sort)
+
+자릿수별로 정렬하는 방법입니다.
+
+```javascript
+function radixSort(arr) {
+    const max = Math.max(...arr);
+    const maxDigits = max.toString().length;
+    
+    let result = [...arr];
+    
+    for (let digit = 0; digit < maxDigits; digit++) {
+        result = countingSortByDigit(result, digit);
+    }
+    
+    return result;
+}
+
+function countingSortByDigit(arr, digit) {
+    const count = Array(10).fill(0);
+    const result = Array(arr.length);
+    
+    // 해당 자릿수 값의 개수 세기
+    for (let num of arr) {
+        const digitValue = Math.floor(num / Math.pow(10, digit)) % 10;
+        count[digitValue]++;
+    }
+    
+    // 누적 개수 계산
+    for (let i = 1; i < 10; i++) {
+        count[i] += count[i - 1];
+    }
+    
+    // 결과 배열 구성
+    for (let i = arr.length - 1; i >= 0; i--) {
+        const digitValue = Math.floor(arr[i] / Math.pow(10, digit)) % 10;
+        result[count[digitValue] - 1] = arr[i];
+        count[digitValue]--;
+    }
+    
+    return result;
+}
+
+console.log(radixSort([170, 45, 75, 90, 2, 802, 24, 66]));
+// [2, 24, 45, 66, 75, 90, 170, 802]
+```
+
+### 버킷 정렬 (Bucket Sort)
+
+범위를 여러 구간으로 나누어 정렬하는 방법입니다.
+
+```javascript
+function bucketSort(arr, bucketCount = 10) {
+    if (arr.length <= 1) return arr;
+    
+    const min = Math.min(...arr);
+    const max = Math.max(...arr);
+    const bucketSize = (max - min) / bucketCount;
+    
+    // 버킷 초기화
+    const buckets = Array(bucketCount).fill().map(() => []);
+    
+    // 각 원소를 적절한 버킷에 배치
+    for (let num of arr) {
+        const bucketIndex = Math.min(
+            Math.floor((num - min) / bucketSize),
+            bucketCount - 1
+        );
+        buckets[bucketIndex].push(num);
+    }
+    
+    // 각 버킷을 정렬하고 합치기
+    const result = [];
+    for (let bucket of buckets) {
+        if (bucket.length > 0) {
+            bucket.sort((a, b) => a - b); // 내장 정렬 사용
+            result.push(...bucket);
+        }
+    }
+    
+    return result;
+}
+
+// 균등하게 분포된 데이터에서 빠름
+const uniformData = [0.897, 0.565, 0.656, 0.1234, 0.665, 0.3434];
+console.log(bucketSort(uniformData.map(x => x * 1000), 5));
+```
+
+## 정렬 알고리즘 선택 가이드
+
+```javascript
+function chooseSortingAlgorithm() {
+    console.log("정렬 알고리즘 선택 가이드:");
+    
+    console.log("\n🔥 일반적인 경우:");
+    console.log("- JavaScript 내장 sort() 사용 추천");
+    console.log("- 시간: O(n log n), 공간: O(log n)");
+    
+    console.log("\n📚 교육/이해 목적:");
+    console.log("- 버블 정렬: 가장 이해하기 쉬움");
+    console.log("- 삽입 정렬: 작은 배열에서 빠름");
+    console.log("- 병합 정렬: 안정 정렬, 최악의 경우에도 O(n log n)");
+    
+    console.log("\n⚡ 특수한 경우:");
+    console.log("- 거의 정렬된 배열: 삽입 정렬");
+    console.log("- 범위가 작은 정수: 계수 정렬");
+    console.log("- 자릿수가 제한된 정수: 기수 정렬");
+    console.log("- 균등 분포 데이터: 버킷 정렬");
+    
+    console.log("\n💾 메모리가 중요한 경우:");
+    console.log("- 힙 정렬: O(1) 추가 공간");
+    console.log("- 퀸 정렬 (제자리): 평균 O(log n) 공간");
+    
+    console.log("\n🎯 안정성이 중요한 경우:");
+    console.log("- 병합 정렬, 삽입 정렬, 버블 정렬");
+    console.log("- (같은 값의 상대적 순서 유지)");
+}
+
+// 안정성 테스트
+function testStability() {
+    const students = [
+        {name: "Alice", score: 85},
+        {name: "Bob", score: 90},
+        {name: "Charlie", score: 85},
+        {name: "David", score: 90}
+    ];
+    
+    console.log("원본:", students);
+    
+    // 안정 정렬
+    const stableSorted = [...students].sort((a, b) => a.score - b.score);
+    console.log("안정 정렬 (내장):", stableSorted);
+    
+    // 같은 점수의 학생들 순서가 유지되는지 확인
+}
+```
+
+## 실제 문제 응용
+
+### 두 배열의 교집합
+
+```javascript
+function intersect(nums1, nums2) {
+    // 두 배열을 정렬
+    nums1.sort((a, b) => a - b);
+    nums2.sort((a, b) => a - b);
+    
+    const result = [];
+    let i = 0, j = 0;
+    
+    while (i < nums1.length && j < nums2.length) {
+        if (nums1[i] === nums2[j]) {
+            result.push(nums1[i]);
+            i++;
+            j++;
+        } else if (nums1[i] < nums2[j]) {
+            i++;
+        } else {
+            j++;
+        }
+    }
+    
+    return result;
+}
+
+console.log(intersect([1, 2, 2, 1], [2, 2])); // [2, 2]
+console.log(intersect([4, 9, 5], [9, 4, 9, 8, 4])); // [4, 9]
+```
+
+### 가장 큰 수 만들기
+
+```javascript
+function largestNumber(nums) {
+    // 사용자 정의 비교 함수
+    const strNums = nums.map(String);
+    
+    strNums.sort((a, b) => (b + a).localeCompare(a + b));
+    
+    const result = strNums.join('');
+    return result[0] === '0' ? '0' : result;
+}
+
+console.log(largestNumber([10, 2])); // "210"
+console.log(largestNumber([3, 30, 34, 5, 9])); // "9534330"
+```
+
+### K번째로 큰 원소
+
+```javascript
+function findKthLargest(nums, k) {
+    // 퀵 셀렉트 알고리즘
+    function quickSelect(arr, left, right, k) {
+        const pivotIndex = partition(arr, left, right);
+        
+        if (pivotIndex === k) {
+            return arr[pivotIndex];
+        } else if (pivotIndex < k) {
+            return quickSelect(arr, pivotIndex + 1, right, k);
+        } else {
+            return quickSelect(arr, left, pivotIndex - 1, k);
+        }
+    }
+    
+    function partition(arr, left, right) {
+        const pivot = arr[right];
+        let i = left - 1;
+        
+        for (let j = left; j < right; j++) {
+            if (arr[j] >= pivot) { // 내림차순으로 정렬
+                i++;
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+        }
+        
+        [arr[i + 1], arr[right]] = [arr[right], arr[i + 1]];
+        return i + 1;
+    }
+    
+    return quickSelect([...nums], 0, nums.length - 1, k - 1);
+}
+
+console.log(findKthLargest([3, 2, 1, 5, 6, 4], 2)); // 5
+console.log(findKthLargest([3, 2, 3, 1, 2, 4, 5, 5, 6], 4)); // 4
+```
+
+## 정렬의 하한선
+
+```javascript
+function sortingLowerBound() {
+    console.log("비교 기반 정렬의 이론적 하한선:");
+    console.log("- 최악의 경우: Ω(n log n)");
+    console.log("- 이는 결정 트리 모델에서 증명됨");
+    
+    console.log("\n비교 기반이 아닌 정렬:");
+    console.log("- 계수 정렬: O(n + k) (k는 범위)");
+    console.log("- 기수 정렬: O(d × (n + k)) (d는 자릿수)");
+    console.log("- 버킷 정렬: 평균 O(n + k) (k는 버킷 수)");
+    
+    console.log("\n실제로는:");
+    console.log("- 대부분의 경우 O(n log n)이 최선");
+    console.log("- 특수한 조건에서만 더 빠른 정렬 가능");
+}
+```
+
+정렬 알고리즘은 컴퓨터 과학의 기초이면서 실제로도 매우 자주 사용됩니다. 상황에 맞는 정렬 알고리즘을 선택하는 것이 중요합니다.

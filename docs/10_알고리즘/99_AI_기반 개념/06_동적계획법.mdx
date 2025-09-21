@@ -1,0 +1,688 @@
+# 동적계획법(Dynamic Programming, DP)
+
+## DP란?
+
+동적계획법은 복잡한 문제를 작은 문제들로 나누어 해결하는 방법입니다.
+
+마치 계단을 오를 때 한 계단씩 차근차근 올라가면서, 이전에 올라온 경험을 기억해두는 것과 같습니다.
+- 작은 문제의 답을 저장해둡니다 (메모이제이션)
+- 같은 계산을 반복하지 않습니다
+- 큰 문제를 작은 문제들의 조합으로 해결합니다
+
+```
+피보나치 수열 예시:
+F(5) = F(4) + F(3)
+F(4) = F(3) + F(2)
+F(3) = F(2) + F(1)
+
+F(3)을 두 번 계산하지 않고 저장해둡니다!
+```
+
+## 기본 예시들
+
+### 피보나치 수열
+
+```javascript
+// 일반 재귀 (매우 느림)
+function fibRecursive(n) {
+    if (n <= 1) return n;
+    return fibRecursive(n - 1) + fibRecursive(n - 2);
+}
+
+// DP - 메모이제이션 (Top-down)
+function fibMemo(n, memo = {}) {
+    if (n <= 1) return n;
+    if (memo[n] !== undefined) return memo[n];
+    
+    memo[n] = fibMemo(n - 1, memo) + fibMemo(n - 2, memo);
+    return memo[n];
+}
+
+// DP - 테뷸레이션 (Bottom-up)
+function fibTabulation(n) {
+    if (n <= 1) return n;
+    
+    const dp = [0, 1];
+    for (let i = 2; i <= n; i++) {
+        dp[i] = dp[i - 1] + dp[i - 2];
+    }
+    return dp[n];
+}
+
+// 공간 최적화
+function fibOptimized(n) {
+    if (n <= 1) return n;
+    
+    let prev = 0, curr = 1;
+    for (let i = 2; i <= n; i++) {
+        [prev, curr] = [curr, prev + curr];
+    }
+    return curr;
+}
+```
+
+### 성능 비교
+
+```javascript
+function compareFibonacci() {
+    const n = 35;
+    
+    let start = performance.now();
+    fibRecursive(n);
+    let end = performance.now();
+    const recursiveTime = end - start;
+    
+    start = performance.now();
+    fibMemo(n);
+    end = performance.now();
+    const memoTime = end - start;
+    
+    start = performance.now();
+    fibTabulation(n);
+    end = performance.now();
+    const tabulationTime = end - start;
+    
+    start = performance.now();
+    fibOptimized(n);
+    end = performance.now();
+    const optimizedTime = end - start;
+    
+    console.log(`일반 재귀: ${recursiveTime.toFixed(2)}ms`);
+    console.log(`메모이제이션: ${memoTime.toFixed(4)}ms`);
+    console.log(`테뷸레이션: ${tabulationTime.toFixed(4)}ms`);
+    console.log(`공간 최적화: ${optimizedTime.toFixed(4)}ms`);
+    
+    console.log(`\n성능 개선:`);
+    console.log(`메모이제이션이 재귀보다 ${(recursiveTime / memoTime).toFixed(0)}배 빠름`);
+}
+```
+
+> 메모이제이션을 사용하면 기하급수적으로 빨라집니다
+
+## 1차원 DP 문제들
+
+### 계단 오르기
+
+```javascript
+// 1칸 또는 2칸씩 올라갈 수 있을 때의 방법의 수
+function climbStairs(n) {
+    if (n <= 2) return n;
+    
+    const dp = [0, 1, 2];
+    for (let i = 3; i <= n; i++) {
+        dp[i] = dp[i - 1] + dp[i - 2];
+    }
+    return dp[n];
+}
+
+// 공간 최적화 버전
+function climbStairsOptimized(n) {
+    if (n <= 2) return n;
+    
+    let prev2 = 1, prev1 = 2;
+    for (let i = 3; i <= n; i++) {
+        const current = prev1 + prev2;
+        prev2 = prev1;
+        prev1 = current;
+    }
+    return prev1;
+}
+
+console.log(climbStairs(5)); // 8
+```
+
+### 집 도둑 문제
+
+```javascript
+// 인접한 집을 털 수 없을 때 최대 금액
+function rob(nums) {
+    if (nums.length === 0) return 0;
+    if (nums.length === 1) return nums[0];
+    
+    const dp = [nums[0], Math.max(nums[0], nums[1])];
+    
+    for (let i = 2; i < nums.length; i++) {
+        dp[i] = Math.max(dp[i - 1], dp[i - 2] + nums[i]);
+    }
+    
+    return dp[nums.length - 1];
+}
+
+// 공간 최적화
+function robOptimized(nums) {
+    if (nums.length === 0) return 0;
+    if (nums.length === 1) return nums[0];
+    
+    let prev2 = nums[0];
+    let prev1 = Math.max(nums[0], nums[1]);
+    
+    for (let i = 2; i < nums.length; i++) {
+        const current = Math.max(prev1, prev2 + nums[i]);
+        prev2 = prev1;
+        prev1 = current;
+    }
+    
+    return prev1;
+}
+
+const houses = [2, 7, 9, 3, 1];
+console.log(rob(houses)); // 12 (2 + 9 + 1)
+```
+
+### 최대 부분 배열 합 (카데인 알고리즘)
+
+```javascript
+function maxSubArray(nums) {
+    let maxSoFar = nums[0];
+    let maxEndingHere = nums[0];
+    
+    for (let i = 1; i < nums.length; i++) {
+        maxEndingHere = Math.max(nums[i], maxEndingHere + nums[i]);
+        maxSoFar = Math.max(maxSoFar, maxEndingHere);
+    }
+    
+    return maxSoFar;
+}
+
+// DP 테이블로 이해하기
+function maxSubArrayDP(nums) {
+    const dp = [nums[0]]; // dp[i] = i번째까지의 최대 부분 배열 합
+    let maxSum = nums[0];
+    
+    for (let i = 1; i < nums.length; i++) {
+        dp[i] = Math.max(nums[i], dp[i - 1] + nums[i]);
+        maxSum = Math.max(maxSum, dp[i]);
+    }
+    
+    return maxSum;
+}
+
+const arr = [-2, 1, -3, 4, -1, 2, 1, -5, 4];
+console.log(maxSubArray(arr)); // 6 ([4, -1, 2, 1])
+```
+
+## 2차원 DP 문제들
+
+### 0-1 배낭 문제
+
+```javascript
+function knapsack(capacity, weights, values) {
+    const n = weights.length;
+    // dp[i][w] = i번째까지 고려했을 때 무게 w에서의 최대 가치
+    const dp = Array(n + 1).fill().map(() => Array(capacity + 1).fill(0));
+    
+    for (let i = 1; i <= n; i++) {
+        for (let w = 1; w <= capacity; w++) {
+            if (weights[i - 1] <= w) {
+                // 현재 아이템을 포함하거나 포함하지 않거나
+                dp[i][w] = Math.max(
+                    dp[i - 1][w], // 포함하지 않음
+                    dp[i - 1][w - weights[i - 1]] + values[i - 1] // 포함
+                );
+            } else {
+                dp[i][w] = dp[i - 1][w]; // 무게 초과로 포함 불가
+            }
+        }
+    }
+    
+    return dp[n][capacity];
+}
+
+// 공간 최적화 (1차원 배열 사용)
+function knapsackOptimized(capacity, weights, values) {
+    const dp = Array(capacity + 1).fill(0);
+    
+    for (let i = 0; i < weights.length; i++) {
+        // 뒤에서부터 업데이트 (중복 사용 방지)
+        for (let w = capacity; w >= weights[i]; w--) {
+            dp[w] = Math.max(dp[w], dp[w - weights[i]] + values[i]);
+        }
+    }
+    
+    return dp[capacity];
+}
+
+const weights = [1, 3, 4, 5];
+const values = [1, 4, 5, 7];
+const capacity = 7;
+console.log(knapsack(capacity, weights, values)); // 9
+```
+
+### 최장 공통 부분 수열 (LCS)
+
+```javascript
+function longestCommonSubsequence(text1, text2) {
+    const m = text1.length, n = text2.length;
+    // dp[i][j] = text1[0...i-1]과 text2[0...j-1]의 LCS 길이
+    const dp = Array(m + 1).fill().map(() => Array(n + 1).fill(0));
+    
+    for (let i = 1; i <= m; i++) {
+        for (let j = 1; j <= n; j++) {
+            if (text1[i - 1] === text2[j - 1]) {
+                dp[i][j] = dp[i - 1][j - 1] + 1;
+            } else {
+                dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
+            }
+        }
+    }
+    
+    return dp[m][n];
+}
+
+// LCS 실제 문자열 구하기
+function getLCS(text1, text2) {
+    const m = text1.length, n = text2.length;
+    const dp = Array(m + 1).fill().map(() => Array(n + 1).fill(0));
+    
+    // DP 테이블 채우기
+    for (let i = 1; i <= m; i++) {
+        for (let j = 1; j <= n; j++) {
+            if (text1[i - 1] === text2[j - 1]) {
+                dp[i][j] = dp[i - 1][j - 1] + 1;
+            } else {
+                dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
+            }
+        }
+    }
+    
+    // 역추적으로 LCS 구성
+    let lcs = '';
+    let i = m, j = n;
+    while (i > 0 && j > 0) {
+        if (text1[i - 1] === text2[j - 1]) {
+            lcs = text1[i - 1] + lcs;
+            i--; j--;
+        } else if (dp[i - 1][j] > dp[i][j - 1]) {
+            i--;
+        } else {
+            j--;
+        }
+    }
+    
+    return lcs;
+}
+
+console.log(longestCommonSubsequence("abcde", "ace")); // 3
+console.log(getLCS("abcde", "ace")); // "ace"
+```
+
+### 격자 경로 문제
+
+```javascript
+// 왼쪽 위에서 오른쪽 아래로 가는 경로의 수
+function uniquePaths(m, n) {
+    const dp = Array(m).fill().map(() => Array(n).fill(1));
+    
+    for (let i = 1; i < m; i++) {
+        for (let j = 1; j < n; j++) {
+            dp[i][j] = dp[i - 1][j] + dp[i][j - 1];
+        }
+    }
+    
+    return dp[m - 1][n - 1];
+}
+
+// 공간 최적화
+function uniquePathsOptimized(m, n) {
+    const dp = Array(n).fill(1);
+    
+    for (let i = 1; i < m; i++) {
+        for (let j = 1; j < n; j++) {
+            dp[j] += dp[j - 1];
+        }
+    }
+    
+    return dp[n - 1];
+}
+
+// 장애물이 있는 경우
+function uniquePathsWithObstacles(obstacleGrid) {
+    const m = obstacleGrid.length, n = obstacleGrid[0].length;
+    const dp = Array(m).fill().map(() => Array(n).fill(0));
+    
+    // 첫 번째 행과 열 초기화
+    dp[0][0] = obstacleGrid[0][0] === 0 ? 1 : 0;
+    
+    for (let i = 1; i < m; i++) {
+        dp[i][0] = obstacleGrid[i][0] === 0 ? dp[i - 1][0] : 0;
+    }
+    
+    for (let j = 1; j < n; j++) {
+        dp[0][j] = obstacleGrid[0][j] === 0 ? dp[0][j - 1] : 0;
+    }
+    
+    // DP 테이블 채우기
+    for (let i = 1; i < m; i++) {
+        for (let j = 1; j < n; j++) {
+            if (obstacleGrid[i][j] === 0) {
+                dp[i][j] = dp[i - 1][j] + dp[i][j - 1];
+            }
+        }
+    }
+    
+    return dp[m - 1][n - 1];
+}
+
+console.log(uniquePaths(3, 7)); // 28
+```
+
+## DP vs 다른 알고리즘 비교
+
+### 코인 체인지 문제
+
+```javascript
+function compareCoinChange() {
+    const coins = [1, 3, 4];
+    const amount = 6;
+    
+    // 그리디 방법 (최적해 보장 안됨)
+    function coinChangeGreedy(coins, amount) {
+        coins.sort((a, b) => b - a);
+        let count = 0;
+        
+        for (let coin of coins) {
+            count += Math.floor(amount / coin);
+            amount %= coin;
+        }
+        
+        return amount === 0 ? count : -1;
+    }
+    
+    // DP 방법 (최적해 보장)
+    function coinChangeDP(coins, amount) {
+        const dp = Array(amount + 1).fill(Infinity);
+        dp[0] = 0;
+        
+        for (let i = 1; i <= amount; i++) {
+            for (let coin of coins) {
+                if (coin <= i) {
+                    dp[i] = Math.min(dp[i], dp[i - coin] + 1);
+                }
+            }
+        }
+        
+        return dp[amount] === Infinity ? -1 : dp[amount];
+    }
+    
+    // 완전탐색 방법
+    function coinChangeBruteForce(coins, amount) {
+        function helper(remaining, count) {
+            if (remaining === 0) return count;
+            if (remaining < 0) return Infinity;
+            
+            let minCount = Infinity;
+            for (let coin of coins) {
+                minCount = Math.min(minCount, helper(remaining - coin, count + 1));
+            }
+            return minCount;
+        }
+        
+        const result = helper(amount, 0);
+        return result === Infinity ? -1 : result;
+    }
+    
+    console.log(`그리디: ${coinChangeGreedy(coins, amount)}개`); // 2개 (틀림)
+    console.log(`DP: ${coinChangeDP(coins, amount)}개`); // 2개 (정답)
+    console.log(`완전탐색: ${coinChangeBruteForce(coins, amount)}개`); // 2개 (정답이지만 느림)
+}
+```
+
+> DP가 그리디보다 정확하고 완전탐색보다 빠릅니다
+
+### 편집 거리 문제
+
+```javascript
+function editDistance(word1, word2) {
+    const m = word1.length, n = word2.length;
+    const dp = Array(m + 1).fill().map(() => Array(n + 1).fill(0));
+    
+    // 초기화
+    for (let i = 0; i <= m; i++) dp[i][0] = i;
+    for (let j = 0; j <= n; j++) dp[0][j] = j;
+    
+    for (let i = 1; i <= m; i++) {
+        for (let j = 1; j <= n; j++) {
+            if (word1[i - 1] === word2[j - 1]) {
+                dp[i][j] = dp[i - 1][j - 1]; // 같으면 변경 불필요
+            } else {
+                dp[i][j] = Math.min(
+                    dp[i - 1][j] + 1,     // 삭제
+                    dp[i][j - 1] + 1,     // 삽입
+                    dp[i - 1][j - 1] + 1  // 교체
+                );
+            }
+        }
+    }
+    
+    return dp[m][n];
+}
+
+console.log(editDistance("horse", "ros")); // 3
+console.log(editDistance("intention", "execution")); // 5
+```
+
+## 성능 최적화 기법들
+
+### 메모이제이션 vs 테뷸레이션 비교
+
+```javascript
+function compareApproaches() {
+    const n = 40;
+    
+    // Top-down (메모이제이션)
+    function fibTopDown(n, memo = new Map()) {
+        if (n <= 1) return n;
+        if (memo.has(n)) return memo.get(n);
+        
+        const result = fibTopDown(n - 1, memo) + fibTopDown(n - 2, memo);
+        memo.set(n, result);
+        return result;
+    }
+    
+    // Bottom-up (테뷸레이션)
+    function fibBottomUp(n) {
+        if (n <= 1) return n;
+        
+        const dp = [0, 1];
+        for (let i = 2; i <= n; i++) {
+            dp[i] = dp[i - 1] + dp[i - 2];
+        }
+        return dp[n];
+    }
+    
+    // 공간 최적화
+    function fibSpaceOptimized(n) {
+        if (n <= 1) return n;
+        
+        let prev = 0, curr = 1;
+        for (let i = 2; i <= n; i++) {
+            [prev, curr] = [curr, prev + curr];
+        }
+        return curr;
+    }
+    
+    let start, end;
+    
+    start = performance.now();
+    fibTopDown(n);
+    end = performance.now();
+    const topDownTime = end - start;
+    
+    start = performance.now();
+    fibBottomUp(n);
+    end = performance.now();
+    const bottomUpTime = end - start;
+    
+    start = performance.now();
+    fibSpaceOptimized(n);
+    end = performance.now();
+    const optimizedTime = end - start;
+    
+    console.log(`Top-down: ${topDownTime.toFixed(4)}ms`);
+    console.log(`Bottom-up: ${bottomUpTime.toFixed(4)}ms`);
+    console.log(`공간 최적화: ${optimizedTime.toFixed(4)}ms`);
+}
+```
+
+> Bottom-up 방식이 일반적으로 더 빠르고 공간 효율적입니다
+
+## 고급 DP 패턴들
+
+### 구간 DP
+
+```javascript
+// 행렬 연쇄 곱셈
+function matrixChainMultiplication(dimensions) {
+    const n = dimensions.length - 1;
+    const dp = Array(n).fill().map(() => Array(n).fill(0));
+    
+    // 길이별로 계산
+    for (let len = 2; len <= n; len++) {
+        for (let i = 0; i <= n - len; i++) {
+            const j = i + len - 1;
+            dp[i][j] = Infinity;
+            
+            for (let k = i; k < j; k++) {
+                const cost = dp[i][k] + dp[k + 1][j] + 
+                           dimensions[i] * dimensions[k + 1] * dimensions[j + 1];
+                dp[i][j] = Math.min(dp[i][j], cost);
+            }
+        }
+    }
+    
+    return dp[0][n - 1];
+}
+
+const matrices = [1, 2, 3, 4]; // 1x2, 2x3, 3x4 행렬들
+console.log(matrixChainMultiplication(matrices)); // 18
+```
+
+### 비트마스킹 DP
+
+```javascript
+// 외판원 순회 문제 (TSP)
+function tsp(graph) {
+    const n = graph.length;
+    const dp = Array(1 << n).fill().map(() => Array(n).fill(Infinity));
+    
+    // 시작점에서 시작
+    dp[1][0] = 0;
+    
+    for (let mask = 1; mask < (1 << n); mask++) {
+        for (let u = 0; u < n; u++) {
+            if (!(mask & (1 << u))) continue;
+            
+            for (let v = 0; v < n; v++) {
+                if (mask & (1 << v)) continue;
+                
+                const newMask = mask | (1 << v);
+                dp[newMask][v] = Math.min(dp[newMask][v], dp[mask][u] + graph[u][v]);
+            }
+        }
+    }
+    
+    // 모든 도시를 방문하고 시작점으로 돌아가기
+    let result = Infinity;
+    const allVisited = (1 << n) - 1;
+    for (let u = 1; u < n; u++) {
+        result = Math.min(result, dp[allVisited][u] + graph[u][0]);
+    }
+    
+    return result;
+}
+
+const tspGraph = [
+    [0, 10, 15, 20],
+    [10, 0, 35, 25],
+    [15, 35, 0, 30],
+    [20, 25, 30, 0]
+];
+console.log(tsp(tspGraph)); // 80
+```
+
+## 실제 문제 응용
+
+### 최장 증가 부분 수열 (LIS)
+
+```javascript
+// O(n²) 방법
+function lengthOfLIS(nums) {
+    const n = nums.length;
+    const dp = Array(n).fill(1);
+    
+    for (let i = 1; i < n; i++) {
+        for (let j = 0; j < i; j++) {
+            if (nums[j] < nums[i]) {
+                dp[i] = Math.max(dp[i], dp[j] + 1);
+            }
+        }
+    }
+    
+    return Math.max(...dp);
+}
+
+// O(n log n) 방법 (이진탐색 활용)
+function lengthOfLISOptimized(nums) {
+    const tails = [];
+    
+    for (let num of nums) {
+        let left = 0, right = tails.length;
+        
+        while (left < right) {
+            const mid = Math.floor((left + right) / 2);
+            if (tails[mid] < num) {
+                left = mid + 1;
+            } else {
+                right = mid;
+            }
+        }
+        
+        if (left === tails.length) {
+            tails.push(num);
+        } else {
+            tails[left] = num;
+        }
+    }
+    
+    return tails.length;
+}
+
+const sequence = [10, 9, 2, 5, 3, 7, 101, 18];
+console.log(lengthOfLIS(sequence)); // 4
+console.log(lengthOfLISOptimized(sequence)); // 4
+```
+
+## DP 문제 해결 단계
+
+```javascript
+function dpProblemSolvingSteps() {
+    console.log("DP 문제 해결 5단계:");
+    console.log("1. 부분 문제 정의하기");
+    console.log("2. 점화식 세우기");
+    console.log("3. 기저 조건 설정하기");
+    console.log("4. 계산 순서 정하기");
+    console.log("5. 공간 최적화 고려하기");
+    
+    console.log("\n예시 - 계단 오르기 문제:");
+    console.log("1. dp[i] = i번째 계단에 도달하는 방법의 수");
+    console.log("2. dp[i] = dp[i-1] + dp[i-2]");
+    console.log("3. dp[1] = 1, dp[2] = 2");
+    console.log("4. 작은 인덱스부터 큰 인덱스로");
+    console.log("5. 이전 두 값만 저장하면 됨");
+}
+```
+
+## 언제 DP를 사용하나요?
+
+### 적합한 경우
+- 최적 부분 구조가 있을 때
+- 중복되는 부분 문제가 있을 때
+- 최적화 문제일 때
+- 경우의 수를 세는 문제일 때
+
+### 주의사항
+- 메모리 사용량이 클 수 있음
+- 점화식을 잘못 세우면 틀린 답이 나옴
+- 모든 문제가 DP로 해결되지는 않음
+
+동적계획법은 복잡한 문제를 효율적으로 해결할 수 있는 강력한 도구입니다. 작은 문제부터 차근차근 해결해나가는 것이 핵심입니다.

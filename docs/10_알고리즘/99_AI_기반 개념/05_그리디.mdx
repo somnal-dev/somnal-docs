@@ -1,0 +1,664 @@
+# 그리디(Greedy) 알고리즘
+
+## 그리디란?
+
+그리디 알고리즘은 매 순간 가장 좋아 보이는 선택을 하는 방법입니다.
+
+마치 배가 고플 때 눈앞에 있는 가장 맛있어 보이는 음식을 먼저 먹는 것과 같습니다.
+- 지금 당장 최선의 선택을 합니다
+- 나중에 후회할 수도 있지만, 빠르게 해답을 구할 수 있습니다
+
+```
+동전 거스름돈 문제:
+거스름돈 1260원을 주는 경우
+
+그리디 접근:
+1. 가장 큰 동전(500원)부터 사용 → 2개 (1000원)
+2. 다음 큰 동전(100원) 사용 → 2개 (200원)  
+3. 다음 큰 동전(50원) 사용 → 1개 (50원)
+4. 마지막(10원) 사용 → 1개 (10원)
+
+총 6개 동전으로 해결!
+```
+
+## 기본 예시들
+
+### 거스름돈 문제
+
+```javascript
+function coinChange(amount) {
+    const coins = [500, 100, 50, 10];
+    const result = [];
+    let remaining = amount;
+    
+    for (let coin of coins) {
+        const count = Math.floor(remaining / coin);
+        if (count > 0) {
+            result.push({coin: coin, count: count});
+            remaining = remaining % coin;
+        }
+    }
+    
+    return result;
+}
+
+console.log(coinChange(1260));
+// [{coin: 500, count: 2}, {coin: 100, count: 2}, {coin: 50, count: 1}, {coin: 10, count: 1}]
+```
+
+### 회의실 배정 문제
+
+```javascript
+// 가장 많은 회의를 배정하기
+function maxMeetings(meetings) {
+    // 끝나는 시간 순으로 정렬
+    meetings.sort((a, b) => a.end - b.end);
+    
+    const selected = [];
+    let lastEndTime = 0;
+    
+    for (let meeting of meetings) {
+        if (meeting.start >= lastEndTime) {
+            selected.push(meeting);
+            lastEndTime = meeting.end;
+        }
+    }
+    
+    return selected;
+}
+
+const meetings = [
+    {name: "A", start: 1, end: 4},
+    {name: "B", start: 3, end: 5},
+    {name: "C", start: 0, end: 6},
+    {name: "D", start: 5, end: 7},
+    {name: "E", start: 8, end: 9},
+    {name: "F", start: 5, end: 9}
+];
+
+console.log(maxMeetings(meetings));
+// [{name: "A", start: 1, end: 4}, {name: "D", start: 5, end: 7}, {name: "E", start: 8, end: 9}]
+```
+
+### 분수 배낭 문제
+
+```javascript
+// 배낭에 넣을 수 있는 최대 가치
+function fractionalKnapsack(capacity, items) {
+    // 가치/무게 비율로 정렬
+    items.sort((a, b) => (b.value / b.weight) - (a.value / a.weight));
+    
+    let totalValue = 0;
+    let remainingCapacity = capacity;
+    const result = [];
+    
+    for (let item of items) {
+        if (remainingCapacity >= item.weight) {
+            // 전체를 넣을 수 있음
+            totalValue += item.value;
+            remainingCapacity -= item.weight;
+            result.push({...item, fraction: 1});
+        } else if (remainingCapacity > 0) {
+            // 일부만 넣을 수 있음
+            const fraction = remainingCapacity / item.weight;
+            totalValue += item.value * fraction;
+            result.push({...item, fraction: fraction});
+            remainingCapacity = 0;
+            break;
+        }
+    }
+    
+    return {totalValue, items: result};
+}
+
+const items = [
+    {name: "A", weight: 10, value: 60},
+    {name: "B", weight: 20, value: 100},
+    {name: "C", weight: 30, value: 120}
+];
+
+console.log(fractionalKnapsack(50, items));
+// {totalValue: 240, items: [...]}
+```
+
+## 그리디 vs 다른 알고리즘 비교
+
+### 0-1 배낭 문제에서 그리디의 한계
+
+```javascript
+function compareKnapsackMethods() {
+    const capacity = 50;
+    const items = [
+        {name: "A", weight: 30, value: 50},
+        {name: "B", weight: 20, value: 40},
+        {name: "C", weight: 10, value: 30}
+    ];
+    
+    // 그리디 방법 (가치/무게 비율 기준)
+    function greedyKnapsack(capacity, items) {
+        const sorted = [...items].sort((a, b) => (b.value / b.weight) - (a.value / a.weight));
+        let totalValue = 0;
+        let remainingCapacity = capacity;
+        const selected = [];
+        
+        for (let item of sorted) {
+            if (remainingCapacity >= item.weight) {
+                totalValue += item.value;
+                remainingCapacity -= item.weight;
+                selected.push(item);
+            }
+        }
+        
+        return {totalValue, selected};
+    }
+    
+    // 완전탐색 방법 (정확한 답)
+    function optimalKnapsack(capacity, items) {
+        let maxValue = 0;
+        let bestCombination = [];
+        
+        // 모든 조합 확인
+        for (let mask = 0; mask < (1 << items.length); mask++) {
+            let weight = 0;
+            let value = 0;
+            const combination = [];
+            
+            for (let i = 0; i < items.length; i++) {
+                if (mask & (1 << i)) {
+                    weight += items[i].weight;
+                    value += items[i].value;
+                    combination.push(items[i]);
+                }
+            }
+            
+            if (weight <= capacity && value > maxValue) {
+                maxValue = value;
+                bestCombination = combination;
+            }
+        }
+        
+        return {totalValue: maxValue, selected: bestCombination};
+    }
+    
+    const greedyResult = greedyKnapsack(capacity, items);
+    const optimalResult = optimalKnapsack(capacity, items);
+    
+    console.log("그리디 결과:", greedyResult);
+    console.log("최적 결과:", optimalResult);
+    console.log("차이:", optimalResult.totalValue - greedyResult.totalValue);
+}
+
+compareKnapsackMethods();
+```
+
+> 그리디는 빠르지만 항상 최적해를 보장하지는 않습니다
+
+### 최단 경로 문제 비교
+
+```javascript
+function compareShortestPath() {
+    const graph = {
+        'A': [['B', 4], ['C', 2]],
+        'B': [['C', 1], ['D', 5]],
+        'C': [['D', 8], ['E', 10]],
+        'D': [['E', 2]],
+        'E': []
+    };
+    
+    // 다익스트라 알고리즘 (그리디)
+    function dijkstra(graph, start, end) {
+        const distances = {};
+        const visited = new Set();
+        const previous = {};
+        
+        // 초기화
+        for (let node in graph) {
+            distances[node] = Infinity;
+        }
+        distances[start] = 0;
+        
+        while (visited.size < Object.keys(graph).length) {
+            // 방문하지 않은 노드 중 거리가 최소인 노드 선택 (그리디)
+            let minNode = null;
+            for (let node in distances) {
+                if (!visited.has(node) && 
+                    (minNode === null || distances[node] < distances[minNode])) {
+                    minNode = node;
+                }
+            }
+            
+            if (minNode === null) break;
+            visited.add(minNode);
+            
+            // 인접 노드들의 거리 업데이트
+            for (let [neighbor, weight] of graph[minNode]) {
+                const newDistance = distances[minNode] + weight;
+                if (newDistance < distances[neighbor]) {
+                    distances[neighbor] = newDistance;
+                    previous[neighbor] = minNode;
+                }
+            }
+        }
+        
+        return distances[end];
+    }
+    
+    // 완전탐색 (모든 경로 확인)
+    function findAllPaths(graph, start, end, path = [], visited = new Set()) {
+        path = [...path, start];
+        visited = new Set([...visited, start]);
+        
+        if (start === end) {
+            return [path];
+        }
+        
+        const paths = [];
+        for (let [neighbor, weight] of graph[start]) {
+            if (!visited.has(neighbor)) {
+                const newPaths = findAllPaths(graph, neighbor, end, path, visited);
+                paths.push(...newPaths);
+            }
+        }
+        
+        return paths;
+    }
+    
+    function calculatePathDistance(graph, path) {
+        let distance = 0;
+        for (let i = 0; i < path.length - 1; i++) {
+            const current = path[i];
+            const next = path[i + 1];
+            const edge = graph[current].find(([node, weight]) => node === next);
+            distance += edge[1];
+        }
+        return distance;
+    }
+    
+    // 성능 테스트
+    let start = performance.now();
+    const dijkstraResult = dijkstra(graph, 'A', 'E');
+    let end = performance.now();
+    const dijkstraTime = end - start;
+    
+    start = performance.now();
+    const allPaths = findAllPaths(graph, 'A', 'E');
+    const shortestPath = allPaths.reduce((min, path) => {
+        const distance = calculatePathDistance(graph, path);
+        return distance < min.distance ? {path, distance} : min;
+    }, {distance: Infinity});
+    end = performance.now();
+    const bruteForceTime = end - start;
+    
+    console.log(`다익스트라 (그리디): ${dijkstraResult}, 시간: ${dijkstraTime.toFixed(4)}ms`);
+    console.log(`완전탐색: ${shortestPath.distance}, 시간: ${bruteForceTime.toFixed(4)}ms`);
+}
+```
+
+> 다익스트라는 그리디 방법이지만 최단 경로 문제에서는 최적해를 보장합니다
+
+## 그리디가 성공하는 조건
+
+### 탐욕적 선택 속성
+
+```javascript
+// 허프만 코딩 (그리디가 최적해를 보장하는 예)
+class Node {
+    constructor(char, freq, left = null, right = null) {
+        this.char = char;
+        this.freq = freq;
+        this.left = left;
+        this.right = right;
+    }
+}
+
+function huffmanCoding(text) {
+    // 빈도수 계산
+    const freqMap = {};
+    for (let char of text) {
+        freqMap[char] = (freqMap[char] || 0) + 1;
+    }
+    
+    // 우선순위 큐 (최소 힙) 구현
+    const heap = Object.entries(freqMap)
+        .map(([char, freq]) => new Node(char, freq))
+        .sort((a, b) => a.freq - b.freq);
+    
+    // 허프만 트리 구성
+    while (heap.length > 1) {
+        const left = heap.shift();
+        const right = heap.shift();
+        const merged = new Node(null, left.freq + right.freq, left, right);
+        
+        // 정렬된 위치에 삽입
+        let inserted = false;
+        for (let i = 0; i < heap.length; i++) {
+            if (merged.freq <= heap[i].freq) {
+                heap.splice(i, 0, merged);
+                inserted = true;
+                break;
+            }
+        }
+        if (!inserted) heap.push(merged);
+    }
+    
+    // 코드 생성
+    const codes = {};
+    function generateCodes(node, code = '') {
+        if (node.char !== null) {
+            codes[node.char] = code || '0';
+            return;
+        }
+        generateCodes(node.left, code + '0');
+        generateCodes(node.right, code + '1');
+    }
+    
+    if (heap.length > 0) {
+        generateCodes(heap[0]);
+    }
+    
+    return codes;
+}
+
+const text = "hello world";
+const codes = huffmanCoding(text);
+console.log("허프만 코드:", codes);
+
+// 압축률 계산
+const originalBits = text.length * 8; // ASCII
+const compressedBits = text.split('').reduce((sum, char) => sum + codes[char].length, 0);
+console.log(`압축률: ${((1 - compressedBits / originalBits) * 100).toFixed(1)}%`);
+```
+
+### 최적 부분 구조
+
+```javascript
+// 최소 신장 트리 (크루스칼 알고리즘)
+class UnionFind {
+    constructor(n) {
+        this.parent = Array.from({length: n}, (_, i) => i);
+        this.rank = Array(n).fill(0);
+    }
+    
+    find(x) {
+        if (this.parent[x] !== x) {
+            this.parent[x] = this.find(this.parent[x]);
+        }
+        return this.parent[x];
+    }
+    
+    union(x, y) {
+        const rootX = this.find(x);
+        const rootY = this.find(y);
+        
+        if (rootX !== rootY) {
+            if (this.rank[rootX] < this.rank[rootY]) {
+                this.parent[rootX] = rootY;
+            } else if (this.rank[rootX] > this.rank[rootY]) {
+                this.parent[rootY] = rootX;
+            } else {
+                this.parent[rootY] = rootX;
+                this.rank[rootX]++;
+            }
+            return true;
+        }
+        return false;
+    }
+}
+
+function kruskalMST(edges, vertices) {
+    // 간선을 가중치 순으로 정렬 (그리디 선택)
+    edges.sort((a, b) => a.weight - b.weight);
+    
+    const uf = new UnionFind(vertices);
+    const mst = [];
+    let totalWeight = 0;
+    
+    for (let edge of edges) {
+        if (uf.union(edge.from, edge.to)) {
+            mst.push(edge);
+            totalWeight += edge.weight;
+        }
+    }
+    
+    return {mst, totalWeight};
+}
+
+const edges = [
+    {from: 0, to: 1, weight: 4},
+    {from: 0, to: 2, weight: 1},
+    {from: 1, to: 2, weight: 2},
+    {from: 1, to: 3, weight: 5},
+    {from: 2, to: 3, weight: 3}
+];
+
+console.log(kruskalMST(edges, 4));
+```
+
+## 성능 최적화 비교
+
+### 작업 스케줄링 문제
+
+```javascript
+function compareJobScheduling() {
+    const jobs = [
+        {id: 1, deadline: 2, profit: 100},
+        {id: 2, deadline: 1, profit: 19},
+        {id: 3, deadline: 2, profit: 27},
+        {id: 4, deadline: 1, profit: 25},
+        {id: 5, deadline: 3, profit: 15}
+    ];
+    
+    // 그리디 방법 (이익 순으로 정렬)
+    function greedyJobScheduling(jobs) {
+        const sortedJobs = [...jobs].sort((a, b) => b.profit - a.profit);
+        const maxDeadline = Math.max(...jobs.map(job => job.deadline));
+        const schedule = Array(maxDeadline).fill(null);
+        let totalProfit = 0;
+        
+        for (let job of sortedJobs) {
+            // 마감일 이전의 가장 늦은 시간에 배치
+            for (let i = Math.min(job.deadline - 1, maxDeadline - 1); i >= 0; i--) {
+                if (schedule[i] === null) {
+                    schedule[i] = job;
+                    totalProfit += job.profit;
+                    break;
+                }
+            }
+        }
+        
+        return {schedule: schedule.filter(job => job !== null), totalProfit};
+    }
+    
+    // 완전탐색 방법
+    function optimalJobScheduling(jobs) {
+        let maxProfit = 0;
+        let bestSchedule = [];
+        const maxDeadline = Math.max(...jobs.map(job => job.deadline));
+        
+        function isValidSchedule(selectedJobs) {
+            const schedule = Array(maxDeadline).fill(null);
+            for (let job of selectedJobs) {
+                let placed = false;
+                for (let i = Math.min(job.deadline - 1, maxDeadline - 1); i >= 0; i--) {
+                    if (schedule[i] === null) {
+                        schedule[i] = job;
+                        placed = true;
+                        break;
+                    }
+                }
+                if (!placed) return false;
+            }
+            return true;
+        }
+        
+        // 모든 부분집합 확인
+        for (let mask = 0; mask < (1 << jobs.length); mask++) {
+            const selectedJobs = [];
+            let profit = 0;
+            
+            for (let i = 0; i < jobs.length; i++) {
+                if (mask & (1 << i)) {
+                    selectedJobs.push(jobs[i]);
+                    profit += jobs[i].profit;
+                }
+            }
+            
+            if (isValidSchedule(selectedJobs) && profit > maxProfit) {
+                maxProfit = profit;
+                bestSchedule = selectedJobs;
+            }
+        }
+        
+        return {schedule: bestSchedule, totalProfit: maxProfit};
+    }
+    
+    // 성능 테스트
+    let start = performance.now();
+    const greedyResult = greedyJobScheduling(jobs);
+    let end = performance.now();
+    const greedyTime = end - start;
+    
+    start = performance.now();
+    const optimalResult = optimalJobScheduling(jobs);
+    end = performance.now();
+    const optimalTime = end - start;
+    
+    console.log(`그리디: 이익 ${greedyResult.totalProfit}, 시간: ${greedyTime.toFixed(4)}ms`);
+    console.log(`최적: 이익 ${optimalResult.totalProfit}, 시간: ${optimalTime.toFixed(4)}ms`);
+    console.log(`정확도: ${(greedyResult.totalProfit / optimalResult.totalProfit * 100).toFixed(1)}%`);
+}
+```
+
+> 이 경우 그리디 방법이 최적해를 찾고 훨씬 빠릅니다
+
+## 실제 문제 예시
+
+### 가스 스테이션 문제
+
+```javascript
+function canCompleteCircuit(gas, cost) {
+    const n = gas.length;
+    let totalGas = 0;
+    let totalCost = 0;
+    let currentGas = 0;
+    let startIndex = 0;
+    
+    for (let i = 0; i < n; i++) {
+        totalGas += gas[i];
+        totalCost += cost[i];
+        currentGas += gas[i] - cost[i];
+        
+        // 현재 위치에서 다음 위치로 갈 수 없으면
+        if (currentGas < 0) {
+            startIndex = i + 1; // 다음 위치부터 시작
+            currentGas = 0;
+        }
+    }
+    
+    // 전체 가스가 전체 비용보다 적으면 불가능
+    return totalGas >= totalCost ? startIndex : -1;
+}
+
+const gas = [1, 2, 3, 4, 5];
+const cost = [3, 4, 5, 1, 2];
+console.log(canCompleteCircuit(gas, cost)); // 3
+```
+
+### 점프 게임
+
+```javascript
+function canJump(nums) {
+    let maxReach = 0;
+    
+    for (let i = 0; i < nums.length; i++) {
+        if (i > maxReach) {
+            return false; // 도달할 수 없음
+        }
+        maxReach = Math.max(maxReach, i + nums[i]);
+        
+        if (maxReach >= nums.length - 1) {
+            return true; // 끝에 도달 가능
+        }
+    }
+    
+    return false;
+}
+
+console.log(canJump([2, 3, 1, 1, 4])); // true
+console.log(canJump([3, 2, 1, 0, 4])); // false
+```
+
+### 최소 점프 횟수
+
+```javascript
+function minJumps(nums) {
+    if (nums.length <= 1) return 0;
+    
+    let jumps = 0;
+    let currentEnd = 0;
+    let farthest = 0;
+    
+    for (let i = 0; i < nums.length - 1; i++) {
+        farthest = Math.max(farthest, i + nums[i]);
+        
+        if (i === currentEnd) {
+            jumps++;
+            currentEnd = farthest;
+            
+            if (currentEnd >= nums.length - 1) {
+                break;
+            }
+        }
+    }
+    
+    return jumps;
+}
+
+console.log(minJumps([2, 3, 1, 1, 4])); // 2
+console.log(minJumps([2, 3, 0, 1, 4])); // 2
+```
+
+## 그리디 알고리즘 설계 단계
+
+```javascript
+function greedyDesignProcess() {
+    console.log("그리디 알고리즘 설계 단계:");
+    console.log("1. 최적화 문제를 확인");
+    console.log("2. 탐욕적 선택 속성 증명");
+    console.log("3. 최적 부분 구조 증명");
+    console.log("4. 알고리즘 구현");
+    console.log("5. 정확성 검증");
+    
+    // 예시: 동전 교환 문제가 그리디로 해결 가능한지 확인
+    function isGreedyOptimal(coins) {
+        // 각 동전이 다음 작은 동전의 배수인지 확인
+        coins.sort((a, b) => b - a);
+        
+        for (let i = 0; i < coins.length - 1; i++) {
+            if (coins[i] % coins[i + 1] !== 0) {
+                return false; // 그리디로 최적해 보장 안됨
+            }
+        }
+        return true;
+    }
+    
+    console.log("\n동전 시스템 분석:");
+    console.log("[500, 100, 50, 10] - 그리디 최적:", isGreedyOptimal([500, 100, 50, 10]));
+    console.log("[4, 3, 1] - 그리디 최적:", isGreedyOptimal([4, 3, 1]));
+}
+```
+
+## 언제 그리디를 사용하나요?
+
+### 적합한 경우
+- 탐욕적 선택 속성이 있을 때
+- 최적 부분 구조가 있을 때
+- 빠른 근사해가 필요할 때
+- 문제의 제약 조건이 그리디를 허용할 때
+
+### 주의해야 할 경우
+- 지역 최적해가 전역 최적해와 다를 수 있을 때
+- 미래의 선택이 현재 선택에 영향을 줄 때
+- 정확한 최적해가 반드시 필요할 때
+
+그리디 알고리즘은 직관적이고 구현이 간단하며 빠른 성능을 제공합니다. 하지만 항상 최적해를 보장하지는 않으므로 문제의 특성을 잘 분석해야 합니다.

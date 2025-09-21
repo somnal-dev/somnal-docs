@@ -1,0 +1,412 @@
+# 알고리즘 테스트 벼락치기 꿀팁
+
+## 시간복잡도 외우기 (5분이면 끝)
+
+```
+O(1) < O(log n) < O(n) < O(n log n) < O(n²) < O(2ⁿ) < O(n!)
+빠름 ←                                                → 느림
+```
+
+### 자주 나오는 시간복잡도
+- **O(1)**: 배열 인덱스 접근, 해시맵 조회
+- **O(log n)**: 이진탐색, 힙 삽입/삭제
+- **O(n)**: 배열 순회, 선형탐색
+- **O(n log n)**: 병합정렬, 힙정렬
+- **O(n²)**: 이중 반복문, 버블정렬
+
+### 빠른 판단법
+```javascript
+// n = 100,000일 때 1초 안에 실행 가능한 복잡도
+O(n²) → 100억 연산 → 시간초과!
+O(n log n) → 170만 연산 → 통과!
+```
+
+## 자료구조 치트시트
+
+### 배열 vs 연결리스트
+```javascript
+// 배열 - 인덱스 접근 빠름
+arr[i] // O(1)
+arr.push(x) // O(1)
+arr.unshift(x) // O(n) - 피하기!
+
+// 연결리스트 - 삽입/삭제 빠름
+list.add(x) // O(1)
+list.find(x) // O(n)
+```
+
+### 스택과 큐 구분법
+```javascript
+// 스택 (LIFO) - 뒤로가기, 괄호검사, DFS
+stack.push(x)
+stack.pop()
+
+// 큐 (FIFO) - 대기열, BFS
+queue.push(x)
+queue.shift() // 느림! 원형큐 써야함
+```
+
+### 해시맵 (Map) - 99% 문제 해결사
+```javascript
+const map = new Map()
+map.set(key, value) // O(1)
+map.get(key) // O(1)
+map.has(key) // O(1)
+
+// 꿀팁: 개수 세기, 중복 제거, 빠른 검색
+```
+
+## 알고리즘별 핵심 패턴
+
+### 투 포인터 (Two Pointers)
+```javascript
+// 정렬된 배열에서 합이 target인 두 수 찾기
+function twoSum(arr, target) {
+    let left = 0, right = arr.length - 1
+    
+    while (left < right) {
+        const sum = arr[left] + arr[right]
+        if (sum === target) return [left, right]
+        if (sum < target) left++
+        else right--
+    }
+    return []
+}
+```
+**언제 쓰나**: 정렬된 배열, 팰린드롬, 구간 문제
+
+### 슬라이딩 윈도우
+```javascript
+// 길이 k인 부배열의 최대 합
+function maxSumSubarray(arr, k) {
+    let sum = 0
+    // 첫 윈도우
+    for (let i = 0; i < k; i++) {
+        sum += arr[i]
+    }
+    
+    let maxSum = sum
+    // 윈도우 슬라이딩
+    for (let i = k; i < arr.length; i++) {
+        sum = sum - arr[i - k] + arr[i]
+        maxSum = Math.max(maxSum, sum)
+    }
+    return maxSum
+}
+```
+**언제 쓰나**: 고정 크기 구간, 문자열 부분 문제
+
+### 이진탐색 템플릿 (외우기!)
+```javascript
+function binarySearch(arr, target) {
+    let left = 0, right = arr.length - 1
+    
+    while (left <= right) {
+        const mid = Math.floor((left + right) / 2)
+        if (arr[mid] === target) return mid
+        if (arr[mid] < target) left = mid + 1
+        else right = mid - 1
+    }
+    return -1
+}
+```
+**꿀팁**: `left + Math.floor((right - left) / 2)` 오버플로우 방지
+
+### BFS 템플릿 (레벨별 탐색)
+```javascript
+function bfs(start) {
+    const queue = [start]
+    const visited = new Set([start])
+    
+    while (queue.length > 0) {
+        const node = queue.shift()
+        
+        for (let neighbor of getNeighbors(node)) {
+            if (!visited.has(neighbor)) {
+                visited.add(neighbor)
+                queue.push(neighbor)
+            }
+        }
+    }
+}
+```
+**언제 쓰나**: 최단거리, 레벨별 처리
+
+### DFS 템플릿 (깊이 우선)
+```javascript
+function dfs(node, visited = new Set()) {
+    if (visited.has(node)) return
+    
+    visited.add(node)
+    // 처리 로직
+    
+    for (let neighbor of getNeighbors(node)) {
+        dfs(neighbor, visited)
+    }
+}
+```
+**언제 쓰나**: 경로 탐색, 백트래킹
+
+## DP 패턴 (동적계획법)
+
+### 1차원 DP
+```javascript
+// 계단 오르기 (1칸 또는 2칸)
+function climbStairs(n) {
+    if (n <= 2) return n
+    
+    let prev2 = 1, prev1 = 2
+    for (let i = 3; i <= n; i++) {
+        const current = prev1 + prev2
+        prev2 = prev1
+        prev1 = current
+    }
+    return prev1
+}
+```
+
+### 2차원 DP
+```javascript
+// 최소 경로 합
+function minPathSum(grid) {
+    const m = grid.length, n = grid[0].length
+    const dp = Array(m).fill().map(() => Array(n))
+    
+    dp[0][0] = grid[0][0]
+    
+    // 첫 행, 첫 열 초기화
+    for (let i = 1; i < m; i++) dp[i][0] = dp[i-1][0] + grid[i][0]
+    for (let j = 1; j < n; j++) dp[0][j] = dp[0][j-1] + grid[0][j]
+    
+    // DP 테이블 채우기
+    for (let i = 1; i < m; i++) {
+        for (let j = 1; j < n; j++) {
+            dp[i][j] = Math.min(dp[i-1][j], dp[i][j-1]) + grid[i][j]
+        }
+    }
+    
+    return dp[m-1][n-1]
+}
+```
+
+## 그리디 알고리즘 판별법
+
+### 그리디가 통하는 경우
+1. **탐욕적 선택 속성**: 지금 최선이 전체 최선
+2. **최적 부분 구조**: 부분 문제의 최적해가 전체 최적해에 포함
+
+### 대표 문제들
+```javascript
+// 동전 거스름돈 (큰 단위부터)
+function coinChange(amount) {
+    const coins = [500, 100, 50, 10]
+    let count = 0
+    
+    for (let coin of coins) {
+        count += Math.floor(amount / coin)
+        amount %= coin
+    }
+    return count
+}
+
+// 회의실 배정 (끝나는 시간 순)
+function maxMeetings(meetings) {
+    meetings.sort((a, b) => a.end - b.end)
+    
+    let count = 0
+    let lastEnd = 0
+    
+    for (let meeting of meetings) {
+        if (meeting.start >= lastEnd) {
+            count++
+            lastEnd = meeting.end
+        }
+    }
+    return count
+}
+```
+
+## 문자열 알고리즘 꿀팁
+
+### 팰린드롬 검사
+```javascript
+function isPalindrome(s) {
+    let left = 0, right = s.length - 1
+    
+    while (left < right) {
+        if (s[left] !== s[right]) return false
+        left++
+        right--
+    }
+    return true
+}
+```
+
+### 애너그램 검사
+```javascript
+function isAnagram(s, t) {
+    if (s.length !== t.length) return false
+    
+    const count = {}
+    for (let char of s) count[char] = (count[char] || 0) + 1
+    for (let char of t) {
+        if (!count[char]) return false
+        count[char]--
+    }
+    return true
+}
+```
+
+## 정렬 선택 가이드
+
+```javascript
+// 상황별 최적 정렬
+const sortingGuide = {
+    "일반적": "JavaScript 내장 sort()",
+    "안정성 필요": "병합정렬",
+    "메모리 제한": "힙정렬",
+    "거의 정렬됨": "삽입정렬",
+    "범위 작은 정수": "계수정렬"
+}
+
+// JavaScript 정렬 팁
+arr.sort((a, b) => a - b) // 숫자 오름차순
+arr.sort((a, b) => b - a) // 숫자 내림차순
+```
+
+## 자주 실수하는 부분들
+
+### 배열 인덱스
+```javascript
+// 실수하기 쉬운 부분
+for (let i = 0; i < arr.length - 1; i++) // 마지막 원소 누락!
+for (let i = 0; i < arr.length; i++) // 올바른 방법
+
+// 안전한 접근
+if (i >= 0 && i < arr.length) {
+    // 배열 접근
+}
+```
+
+### 무한루프 조심
+```javascript
+// 위험한 코드
+while (left < right) {
+    if (condition) left = mid // mid가 left와 같을 수 있음!
+}
+
+// 안전한 코드
+while (left < right) {
+    if (condition) left = mid + 1
+    else right = mid
+}
+```
+
+### 정수 오버플로우
+```javascript
+// 위험
+const mid = (left + right) / 2
+
+// 안전
+const mid = left + Math.floor((right - left) / 2)
+```
+
+## 시험장에서 써먹는 디버깅 팁
+
+### 작은 예시로 검증
+```javascript
+// 항상 간단한 케이스부터
+console.log(solution([1, 2, 3])) // 예상 결과와 비교
+console.log(solution([])) // 엣지 케이스
+console.log(solution([1])) // 최소 케이스
+```
+
+### 중간값 출력
+```javascript
+function solution(arr) {
+    console.log("입력:", arr) // 디버깅용
+    
+    let result = process(arr)
+    
+    console.log("결과:", result) // 디버깅용
+    return result
+}
+```
+
+## 시간 단축 꿀팁들
+
+### JavaScript 내장 함수 활용
+```javascript
+// 최대/최소값
+Math.max(...arr)
+Math.min(...arr)
+
+// 배열 합계
+arr.reduce((sum, x) => sum + x, 0)
+
+// 중복 제거
+[...new Set(arr)]
+
+// 배열 뒤집기
+arr.reverse()
+
+// 부분 배열
+arr.slice(start, end)
+```
+
+### 자주 쓰는 패턴들
+```javascript
+// 2차원 배열 초기화
+const matrix = Array(m).fill().map(() => Array(n).fill(0))
+
+// 방향 배열 (상하좌우)
+const directions = [[-1,0], [1,0], [0,-1], [0,1]]
+
+// 범위 체크
+const isValid = (r, c) => r >= 0 && r < rows && c >= 0 && c < cols
+```
+
+## 마지막 체크리스트
+
+### 코딩 전 (30초만 투자)
+- [ ] 시간복잡도 계산했나?
+- [ ] 엣지 케이스 생각했나? (빈 배열, 길이 1)
+- [ ] 오버플로우 가능성은?
+
+### 코딩 후 (1분만 투자)
+- [ ] 경계값 확인 (0, length-1)
+- [ ] 무한루프 가능성
+- [ ] 간단한 테스트 케이스로 검증
+
+### 자주 나오는 엣지 케이스들
+```javascript
+// 항상 확인하기
+const edgeCases = [
+    [], // 빈 배열
+    [1], // 길이 1
+    [1, 1], // 중복값
+    [-1, 0, 1], // 음수 포함
+    [1000000], // 큰 수
+]
+```
+
+## 시험 당일 마인드셋
+
+### 문제 읽기 (2분)
+1. 입력/출력 형태 파악
+2. 제약 조건 확인 (n의 범위)
+3. 시간복잡도 요구사항 추정
+
+### 접근 방법 (1분)
+1. 완전탐색으로 풀 수 있나?
+2. 정렬하면 쉬워지나?
+3. 해시맵으로 O(1) 조회 가능하나?
+4. DP로 중복 계산 제거 가능하나?
+
+### 구현 순서
+1. 가장 단순한 방법부터
+2. 작은 테스트 케이스로 검증
+3. 최적화 고려
+4. 엣지 케이스 처리
+
+이 꿀팁들만 머릿속에 넣고 가면 대부분의 알고리즘 문제는 해결할 수 있습니다!

@@ -1,0 +1,100 @@
+
+export function getData() {
+    const size = 1000000;
+    const maxValue = 10000;
+    let testData = [];
+
+    for(let i = 0; i < size; i++) {
+        testData.push(Math.floor(Math.random() * maxValue) + 1);
+    }
+
+    return testData;
+}
+
+export function test1() {
+
+    const start = performance.now();
+
+    var map = new Map();
+
+    getData().forEach(p => {
+        map.set(p, (map.get(p) || 0) + 1);
+    })
+
+    const end = performance.now();
+
+    return `소요 시간 : ${end - start} ms`
+}
+
+export function test2() {
+
+    const start = performance.now();
+
+    var count = {};
+
+    getData().forEach((p) => {
+        count[p] = (count[p] || 0) + 1;
+    });
+
+    const end = performance.now();
+
+    return `소요 시간 : ${end - start} ms`
+}
+
+export function test3() {
+
+    const start = performance.now();
+
+    var count = {};
+    const data = getData();
+
+    for (let i = 0; i < data.length; i++) {
+        let p = data[i];
+        count[p] = (count[p] || 0) + 1;
+    }
+
+    const end = performance.now();
+
+    return `소요 시간 : ${end - start} ms`
+}
+
+## 속도 비교
+
+> for 루프를 이용한 방법이 가장 빠르다.
+
+Map을 사용한 카운터 : {test1()} <br/>
+Object를 사용한 카운터 : {test2()} <br/>
+for루프를 사용한 카운터 : {test3()} <br/>
+
+## Map을 사용한 카운터
+
+```js
+var map = new Map();
+
+getData().forEach(p => {
+    map.set(p, (map.get(p) || 0) + 1);
+})
+```
+
+## Object를 사용한 카운터
+
+```js
+var count = {};
+
+getData().forEach((p) => {
+    count[p] = (count[p] || 0) + 1;
+});
+```
+
+## for 루프를 사용한 카운터
+
+```js
+var count = {};
+
+const data = getData();
+
+for (let i = 0; i < data.length; i++) {
+    let p = data[i];
+    count[p] = (count[p] || 0) + 1;
+}
+```

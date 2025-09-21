@@ -1,0 +1,16 @@
+
+## 배열을 Set으로 변환
+
+```js
+const list = [1, 2, 3, 2, 4, 1];
+const set = new Set(list);
+console.log(set); // Set(4) {1, 2, 3, 4}
+```
+
+## Set을 배열로 변환
+
+```js
+const set = new Set([1, 2, 3, 4]);
+const list = [...set];
+console.log(list); // [1, 2, 3, 4]
+```

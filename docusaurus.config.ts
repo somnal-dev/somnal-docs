@@ -60,9 +60,10 @@ const config: Config = {
       'classic',
       {
         docs: {
-          sidebarCollapsed: false,
+          sidebarCollapsed: true,
+          sidebarCollapsible: true,
+          
           sidebarPath: './sidebars.ts',
-          sidebarCollapsible: false,
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           // editUrl:

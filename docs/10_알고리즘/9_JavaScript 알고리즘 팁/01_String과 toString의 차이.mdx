@@ -1,0 +1,37 @@
+일반적으로 String() 생성자가 더 느리다.
+
+```typescript
+let a = String(1); // 더 느림
+let a = 1.toString(); // 더 빠름
+```
+
+export function string1() {
+
+    let start = performance.now();
+
+    for(let i = 0; i <= 10000000; i++) {
+        let a = String(i);
+    }
+
+    let end = performance.now();
+
+    return `${end - start} ms 소요됨`
+}
+
+export function string2() {
+
+    let start = performance.now();
+
+    for(let i = 0; i <= 10000000; i++) {
+        let a = i.toString();
+    }
+
+    let end = performance.now();
+
+    return `${end - start} ms 소요됨`
+}
+
+### 1000만 번 수행한 결과
+
+String() 결과 : {string1()} <br/>
+toString() 결과 : {string2()}

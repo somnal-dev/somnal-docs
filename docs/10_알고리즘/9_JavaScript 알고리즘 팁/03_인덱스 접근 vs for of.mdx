@@ -1,0 +1,35 @@
+
+index 로 접근하는 것이 for of 로 접근하는 것 보다 속도가 빠르다.
+
+export function test1() {
+
+    const array = Array(100000).fill(0);
+
+    let start = performance.now();
+
+    for(let i = 0; i <= array.length; i++) {
+        console.log(i);
+    }
+
+    let end = performance.now();
+
+    return `${end - start} ms 소요됨`
+}
+
+export function test2() {
+
+    const array = Array(100000).fill(0);
+
+    let start = performance.now();
+
+    for(let i of array) {
+        console.log(i);
+    }
+
+    let end = performance.now();
+
+    return `${end - start} ms 소요됨`
+}
+
+index 접근 방법 : {test1()} <br/>
+for of 접근 방법 : {test2()}

@@ -1,0 +1,5 @@
+
+```sql
+delete from strapi_core_store_settings
+where "key" like 'plugin_users-permissions_grant';
+```

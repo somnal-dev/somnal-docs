@@ -1,0 +1,14 @@
+
+## 3 X 4 배열 생성
+
+export const arr = Array.from({ length: 3 }, () => Array(4).fill(0));
+
+```js
+const arr = Array.from({ length: 3 }, () => Array(4).fill(0));
+```
+
+결과 : {
+arr.map(row => {
+    return row.join(' ')
+}).join(' | ')
+}

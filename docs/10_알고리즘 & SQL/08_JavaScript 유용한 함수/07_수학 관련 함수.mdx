@@ -1,0 +1,26 @@
+
+## 최대 공약수
+
+```js
+// 최대공약수
+const gcd = (a, b) => b === 0 ? a : gcd(b, a % b);
+```
+
+## 최소 공배수
+
+```js
+// 최소공배수
+const lcm = (a, b) => (a * b) / gcd(a, b);
+```
+
+## 소수 체크
+
+```js
+// 소수 체크
+const isPrime = n => n > 1 && ![...Array(Math.sqrt(n))].some((_, i) => n % (i + 2) === 0);
+```
+
+export const isPrime = n => n > 1 && ![...Array(Math.floor(Math.sqrt(n)))].some((_, i) => n % (i + 2) === 0);
+
+결과 (51) : {isPrime(51).toString()} <br/>
+결과 (107) : {isPrime(107).toString()} <br/>

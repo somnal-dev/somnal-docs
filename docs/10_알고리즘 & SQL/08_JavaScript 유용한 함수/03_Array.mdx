@@ -18,3 +18,14 @@ export const arr2 = new Array(10).fill(0);
 ```js
 const arr = new Array(10).fill(0);
 ```
+
+## 배열을 특정한 규칙으로 채우기
+
+export const arr3 = Array.from({length: 10}, (_, i) => i);
+
+결과 : {arr3.toString()}
+
+```js
+// 1차원 배열 (0~n-1)
+const arr = Array.from({length: 10}, (_, i) => i);
+```

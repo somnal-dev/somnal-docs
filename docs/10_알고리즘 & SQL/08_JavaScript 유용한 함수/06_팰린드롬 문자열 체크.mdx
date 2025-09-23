@@ -1,0 +1,15 @@
+
+## 팰린드롬 문자열 체크
+
+```js
+const isPalindrome = str === str.split('').reverse().join('');
+```
+
+export const isPalindrome = (str) => {
+    return str === str.split('').reverse().join('');
+}
+
+비교 문자열 1 : assa <br/>
+비교 문자열 2 : assb <br/>
+결과 : {isPalindrome('assa') === true ? '팰린드롬' : '팰린드롬 아님'} <br/>
+결과 : {isPalindrome('assb') === true ? '팰린드롬' : '팰린드롬 아님'}

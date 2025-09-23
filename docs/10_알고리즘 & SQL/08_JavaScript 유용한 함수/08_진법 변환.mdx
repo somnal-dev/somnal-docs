@@ -1,0 +1,17 @@
+
+## 10진수에서 다른 진수로 변환하기
+
+```js
+const dec = 255;
+const bin = dec.toString(2);     // "11111111"
+const hex = dec.toString(16);    // "ff"
+const oct = dec.toString(8);     // "377"
+```
+
+## 다른 진수에서 10진수로 변환하기
+
+```js
+const binToDec = parseInt("1010", 2);   // 10
+const hexToDec = parseInt("ff", 16);    // 255
+const octToDec = parseInt("77", 8);     // 63
+```

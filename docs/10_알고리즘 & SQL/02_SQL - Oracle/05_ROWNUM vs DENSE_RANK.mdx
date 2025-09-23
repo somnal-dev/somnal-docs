@@ -1,0 +1,19 @@
+
+```sql
+SELECT 
+    name, 
+    salary,
+    ROW_NUMBER() OVER (ORDER BY salary DESC) as row_num,
+    DENSE_RANK() OVER (ORDER BY salary DESC) as dense_rank
+FROM Employee
+ORDER BY salary DESC;
+
+-- 결과:
+-- Name   | Salary | ROW_NUMBER | DENSE_RANK
+-- -------|--------|------------|------------
+-- 김철수  | 10000  |     1      |     1
+-- 이영희  | 9000   |     2      |     2
+-- 박민수  | 9000   |     3      |     2     ← 같은 순위!
+-- 최지훈  | 8000   |     4      |     3     ← 다음 순위는 3
+-- 홍길동  | 7000   |     5      |     4
+```

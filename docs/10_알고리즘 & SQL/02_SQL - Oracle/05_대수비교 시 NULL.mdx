@@ -1,0 +1,8 @@
+
+대수 비교 시 NULL 과 비교하면 항상 `false` 이다.
+
+```sql
+SELECT *
+  FROM A
+ WHERE A.SCORE < NULL -- 항상 false
+```

@@ -1,0 +1,133 @@
+
+```js
+class Queue {
+    constructor() {
+      this.items = {};
+      this.frontIndex = 0;
+      this.backIndex = 0;
+    }
+  
+    enqueue(item) {
+      this.items[this.backIndex] = item;
+      this.backIndex++;
+    }
+  
+    dequeue() {
+      if (this.isEmpty()) return undefined;
+      
+      const item = this.items[this.frontIndex];
+      delete this.items[this.frontIndex];
+      this.frontIndex++;
+      return item;
+    }
+  
+    isEmpty() {
+      return this.frontIndex === this.backIndex;
+    }
+  
+    size() {
+      return this.backIndex - this.frontIndex;
+    }
+}
+
+// 직접 구현한 Queue 클래스를 사용한 BFS
+function bfs(g, s, visit) {
+    const q = new Queue();
+    q.enqueue(s);
+    
+    while (!q.isEmpty()) {
+      const current = q.dequeue(); // O(1) 연산
+      console.log(current);
+      
+      for (const n of graph[current]) {
+        if (!visit[n]) {
+            visit[n] = true;
+            q.enqueue(n);
+        }
+      }
+    }
+    
+    return visited.size; // 방문한 노드 수 반환
+}
+
+let graph = [
+    [],
+    [2, 3, 8],
+    [1, 7],
+    [1, 4, 5],
+    [3, 5],
+    [3, 4],
+    [7],
+    [2, 6, 8],
+    [1, 7],
+]
+  
+let visited = [...Array(9).fill(false)];
+bfs(graph, 1, visited);
+```
+
+export let result = [];
+
+export class Queue {
+    constructor() {
+      this.items = {};
+      this.front = 0;
+      this.back = 0;
+    }
+  
+    enqueue(item) {
+      this.items[this.back] = item;
+      this.back++;
+    }
+  
+    dequeue() {
+      if (this.isEmpty()) return undefined;
+      
+      const item = this.items[this.front];
+      delete this.items[this.front];
+      this.front++;
+      return item;
+    }
+  
+    isEmpty() {
+      return this.front === this.back;
+    }
+  
+    size() {
+      return this.back - this.front;
+    }
+}
+
+export function bfs(g, s, visit) {
+    const q = new Queue();
+    q.enqueue(s);
+    
+    while (!q.isEmpty()) {
+      const c = q.dequeue(); // O(1) 연산
+      result.push(c);
+      
+      for (const n of g[c]) {
+        if (!visit[n]) {
+            visit[n] = true;
+            q.enqueue(n);
+        }
+      }
+    }
+}
+
+export let graph = [
+    [],
+    [2, 3, 8],
+    [1, 7],
+    [1, 4, 5],
+    [3, 5],
+    [3, 4],
+    [7],
+    [2, 6, 8],
+    [1, 7],
+]
+  
+export let visited = [...Array(9).fill(false)]
+
+{bfs(graph, 1, visited)}
+결과 : {result}

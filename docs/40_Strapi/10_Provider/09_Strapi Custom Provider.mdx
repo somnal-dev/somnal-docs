@@ -1,0 +1,34 @@
+
+> /src/index.ts
+
+```typescript
+export default {
+  register({ strapi }: { strapi: Core.Strapi }) {
+    // 카카오 로그인 - 웹
+    strapi
+        .plugin("users-permissions")
+        .service("providers-registry")
+        .add("kakao", {
+            icon: "",
+            enabled: true,
+            grantConfig: {
+            key: strapi.config.server.kakaoApiKey,
+            secret: strapi.config.server.kakaoSecretKey,
+            callback: `${strapi.config.server.url}/${strapi.config.server.kakaoWebRedirectURI}`,
+            scope: ["profile_nickname", "profile_image", "account_email"],
+            authorize_url: "https://kauth.kakao.com/oauth/authorize",
+            access_url: "https://kauth.kakao.com/oauth/token",
+            oauth: 2,
+            },
+            async authCallback({ accessToken, providers, purest }) {
+            try {
+                return await kakaoAuthCallback(accessToken);
+            } catch (error) {
+                console.error("카카오 사용자 정보 가져오기 실패:", error);
+                throw error;
+            }
+            },
+        });
+    });
+}
+```

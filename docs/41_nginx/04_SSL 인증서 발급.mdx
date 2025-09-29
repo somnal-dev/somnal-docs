@@ -1,0 +1,8 @@
+
+## SSL 인증서 발급
+
+> 우선 nginx 로 80 포트 활성화가 필요해요.
+
+```bash
+docker-compose run --rm certbot certonly --webroot -w /var/www/certbot --email 이메일주소 -d 도메인 --agree-tos
+```

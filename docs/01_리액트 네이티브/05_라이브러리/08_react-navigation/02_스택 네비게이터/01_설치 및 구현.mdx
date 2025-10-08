@@ -3,5 +3,26 @@
 
 ## 설치
 ```
+yarn add @react-navigation/native
+yarn add react-native-screens react-native-safe-area-context react-native-gesture-handler
+yarn add -D @types/react-native-gesture-handler
 yarn add @react-navigation/native-stack
+```
+
+## 구현
+
+```ts
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
+const Stack = createNativeStackNavigator();
+
+const RootNavigation = () => {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen name={routes.main} component={MainScreen} />
+    </Stack.Navigator>
+  );
+};
+
+export default RootNavigation;
 ```
